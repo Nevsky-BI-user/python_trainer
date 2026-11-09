@@ -2,6 +2,7 @@
 //   npm run verify                 усе
 //   npm run verify -- --only p4    лише ідентифікатори, що починаються з p4
 //   npm run verify -- --no-run     лише схема і текст, без Python
+//   npm run verify -- --verbose    ще й справжній вивід кожного прикладу та еталону
 //
 // Для кожного прикладу: вивід коду == output.
 // Для кожної вправи і кроку задачі: еталон проходить (вивід/перевірка), а стартовий
@@ -37,6 +38,7 @@ if (!noRun) {
         const cmp = compareOutput(shown, ex.output);
         if (!cmp.equal) failures.push({ id, what: `вивід прикладу розходиться з output (рядок ${cmp.line})`, actual: shown });
         else if (r.images.length && !ex.images) failures.push({ id, what: 'приклад малює графік: додай images: true' });
+        else if (verbose) report(id, shown);
       }
       for (const [i, ex] of lesson.exercises.entries()) {
         const id = `${lesson.id}/e${i + 1}`;
@@ -58,6 +60,12 @@ if (!noRun) {
   }
 }
 
+function report(id, stdout) {
+  console.log(`ok ${id}`);
+  const text = String(stdout ?? '').replace(/\n+$/, '');
+  if (text) console.log(text.split('\n').map((l) => `        | ${l}`).join('\n'));
+}
+
 async function checkItem(rt, id, item, makePayload) {
   const good = await rt.run(makePayload(item.solution));
   const verdict = judge(item, good);
@@ -68,7 +76,7 @@ async function checkItem(rt, id, item, makePayload) {
       actual: good.error || good.stdout,
     });
   } else if (verbose) {
-    console.log(`ok ${id}`);
+    report(id, good.stdout);
   }
   const bad = await rt.run(makePayload(item.starter));
   if (judge(item, bad).passed) {

@@ -46,24 +46,28 @@ export function stepPayload(task, stepIndex, code) {
  * Вердикт за результатом запуску.
  * item: вправа або крок (expected та/або check).
  * result: відповідь harness.run.
+ * Повертає { passed, kind, message, mismatch, line }: mismatch означає, що вивід
+ * не збігся з expected, line: перший розбіжний рядок.
+ * Конкретне повідомлення check важливіше за загальне «вивід не збігається»,
+ * тому при обох збоях вердикт бере текст check, а розбіжність виводу лишається в mismatch.
  */
 export function judge(item, result) {
   if (result.error) {
-    return { passed: false, kind: 'error', message: result.error };
+    return { passed: false, kind: 'error', message: result.error, mismatch: false, line: null };
   }
-  if (item.expected !== undefined && item.expected !== null) {
-    const cmp = compareOutput(result.stdout, item.expected);
-    if (!cmp.equal) {
-      return { passed: false, kind: 'output', line: cmp.line, message: 'Вивід не збігається з очікуваним' };
-    }
-  }
+  const hasExpected = item.expected !== undefined && item.expected !== null;
+  const cmp = hasExpected ? compareOutput(result.stdout, item.expected) : { equal: true, line: null };
+  const mismatch = !cmp.equal;
   if (item.check) {
     if (!result.check) {
-      return { passed: false, kind: 'check', message: 'Перевірка не виконалась' };
+      return { passed: false, kind: 'check', message: 'Перевірка не виконалась', mismatch, line: cmp.line };
     }
     if (!result.check.ok) {
-      return { passed: false, kind: 'check', message: result.check.message };
+      return { passed: false, kind: 'check', message: result.check.message, mismatch, line: cmp.line };
     }
   }
-  return { passed: true, kind: 'ok', message: '' };
+  if (mismatch) {
+    return { passed: false, kind: 'output', message: 'Вивід не збігається з очікуваним', mismatch, line: cmp.line };
+  }
+  return { passed: true, kind: 'ok', message: '', mismatch: false, line: null };
 }

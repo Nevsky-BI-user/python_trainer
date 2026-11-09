@@ -7,7 +7,12 @@ import { sortByFile } from '../../src/content/order.js';
 
 async function loadDir(dir) {
   const abs = path.join(ROOT, 'src', 'content', dir);
-  const files = (await readdir(abs)).filter((f) => f.endsWith('.js'));
+  // Порожньої теки git не зберігає: її відсутність означає «ще немає контенту», а не збій.
+  const names = await readdir(abs).catch((err) => {
+    if (err.code === 'ENOENT') return [];
+    throw err;
+  });
+  const files = names.filter((f) => f.endsWith('.js'));
   const entries = await Promise.all(
     files.map(async (f) => [`./${dir}/${f}`, await import(pathToFileURL(path.join(abs, f)).href)]),
   );

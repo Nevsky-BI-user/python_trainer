@@ -1,6 +1,6 @@
 // Перевірка структури контенту. Повертає список проблем (рядки); порожній список = гаразд.
 
-const FORBIDDEN = /[–—]/;
+const FORBIDDEN = /[\u2013\u2014]/;
 
 const KEYS = {
   module: ['id', 'title', 'lessons'],

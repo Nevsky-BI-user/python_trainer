@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Тренажер Python для дата-аналітика: уроки, вправи і багатокрокові задачі. Код виконується в браузері (Pyodide): pandas, numpy, matplotlib." />
+    <title>Python тренажер</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232456d6'/%3E%3Cpath d='M9 10l6 6-6 6' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M17 22h7' stroke='%23ffd84d' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <script>
+      // Тема до першого кадру, щоб сторінка не блимала світлим у темному режимі.
+      try {
+        var saved = JSON.parse(localStorage.getItem('pytrainer:v2') || '{}').theme;
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">До змісту</a>
+    <div class="app" id="app">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Зміст" aria-controls="sidebar" aria-expanded="false"></button>
+        <a class="brand" href="#/">
+          <span class="brand-mark" aria-hidden="true">py</span>
+          <span class="brand-text">
+            <span class="brand-name">Тренажер</span>
+            <span class="brand-sub">Python для дата-аналітика</span>
+          </span>
+        </a>
+        <span class="topbar-spacer"></span>
+        <div class="py-status" id="py-status" data-state="idle" role="status" aria-live="polite">
+          <span class="py-dot" aria-hidden="true"></span>
+          <span class="py-text">Python</span>
+        </div>
+        <button class="icon-btn" id="theme-btn" type="button" aria-label="Змінити тему"></button>
+      </header>
+      <aside class="sidebar" id="sidebar" aria-label="Зміст"></aside>
+      <main class="main" id="main" tabindex="-1"></main>
+    </div>
+    <div class="scrim" id="scrim" hidden></div>
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+    <dialog class="dialog" id="dialog">
+      <form method="dialog">
+        <p class="dialog-text" id="dialog-text"></p>
+        <div class="dialog-actions">
+          <button class="btn ghost" value="cancel" type="submit">Скасувати</button>
+          <button class="btn danger" value="ok" type="submit" id="dialog-ok">Так</button>
+        </div>
+      </form>
+    </dialog>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
