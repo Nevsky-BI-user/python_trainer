@@ -533,7 +533,7 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
 ax1.bar(intensity.index, intensity.values)
 ax1.set_title("Споживання за місяць, кВт·год на м²")
 ax1.set_xlabel("Офіс")
-ax1.set_ylabel("На 1 м²")
+ax1.set_ylabel("Споживання")
 
 ax2.plot(pivot.columns.astype(str), pivot.loc[worst] / 1000, marker="o")
 ax2.set_title(f"{worst} за місяцями, тис. кВт·год")
