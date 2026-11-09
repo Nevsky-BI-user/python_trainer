@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+.claude/worktrees/
+.local/
+*.log
+.pyodide-cache/
+__pycache__/

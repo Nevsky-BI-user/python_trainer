@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Python тренажер для дата-аналітика</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+<style>
+:root {
+  --bg: #ffffff;
+  --bg2: #f9fafb;
+  --bg3: #f3f4f6;
+  --border: #e5e7eb;
+  --border2: #d1d5db;
+  --text: #111827;
+  --text2: #374151;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-h: #1d4ed8;
+  --accent-bg: #eff6ff;
+  --accent2: #059669;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --err: #dc2626;
+  --err-bg: #fef2f2;
+  --ok: #16a34a;
+  --ok-bg: #f0fdf4;
+  --output-bg: #f8fafc;
+  --output-text: #064e3b;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.6;
+}
+#sidebar {
+  width: 300px;
+  min-width: 300px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 20px 0 16px;
+}
+#sidebar h1 {
+  font-size: 16px;
+  margin: 0 16px 4px;
+  color: var(--text);
+  font-weight: 700;
+}
+#sidebar .subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 16px 16px;
+}
+.progress-bar {
+  margin: 0 16px 6px;
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width 0.3s;
+}
+.progress-text {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0 16px 16px;
+}
+.module-title {
+  padding: 12px 16px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+.lesson-item {
+  padding: 8px 16px 8px 24px;
+  cursor: pointer;
+  font-size: 13px;
+  border-left: 3px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+.lesson-item:hover { background: var(--bg3); }
+.lesson-item.active {
+  background: var(--accent-bg);
+  border-left-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.lesson-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+  font-weight: 700;
+  background: var(--bg);
+}
+.lesson-check.done {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: white;
+}
+.lesson-check.partial {
+  background: var(--warn);
+  border-color: var(--warn);
+  color: white;
+}
+#main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 44px;
+  max-width: 100%;
+}
+#main h2 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 700;
+}
+#main h3 {
+  color: var(--text);
+  margin-top: 32px;
+  font-size: 17px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+#main h4 {
+  color: var(--text);
+  margin: 18px 0 8px;
+  font-size: 14px;
+}
+.theory {
+  background: var(--accent-bg);
+  border-left: 3px solid var(--accent);
+  padding: 14px 18px;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  color: var(--text2);
+}
+.theory p { margin: 0 0 8px; }
+.theory p:last-child { margin-bottom: 0; }
+.theory code, .inline-code {
+  background: rgba(37, 99, 235, 0.1);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "JetBrains Mono", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  color: var(--accent);
+  font-weight: 500;
+}
+.example {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+}
+.example-header {
+  padding: 8px 14px;
+  background: var(--bg3);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--border);
+}
+.example-body { padding: 14px; }
+.example-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+  font-style: italic;
+}
+pre[class*="language-"] {
+  margin: 0 !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  background: var(--bg2) !important;
+  border: 1px solid var(--border);
+}
+code[class*="language-"], pre[class*="language-"] {
+  text-shadow: none !important;
+}
+.output-block {
+  background: var(--output-bg);
+  color: var(--output-text);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-family: "SF Mono", "JetBrains Mono", Monaco, Consolas, monospace;
+  font-size: 13px;
+  margin-top: 8px;
+  white-space: pre-wrap;
+  border-left: 3px solid var(--ok);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--ok);
+}
+.output-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.exercise {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 18px 0;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.exercise.done {
+  border-color: var(--ok);
+  box-shadow: 0 0 0 1px var(--ok);
+}
+.exercise-header {
+  padding: 12px 16px;
+  background: var(--bg2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.exercise-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+}
+.exercise-status {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--bg3);
+  color: var(--muted);
+  font-weight: 600;
+}
+.exercise-status.done {
+  background: var(--ok);
+  color: white;
+}
+.exercise-body { padding: 14px 16px; }
+.task-text {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--text2);
+}
+.task-text code {
+  background: var(--bg3);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: "SF Mono", Monaco, monospace;
+  font-size: 12.5px;
+  color: var(--text);
+}
+.editor-wrap {
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.editor {
+  width: 100%;
+  background: transparent;
+  color: var(--text);
+  border: none;
+  padding: 10px 12px;
+  font-family: "SF Mono", "JetBrains Mono", Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  tab-size: 4;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}
+.editor:focus { background: var(--bg); }
+.exercise-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn:hover { background: var(--accent-h); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.secondary {
+  background: var(--bg3);
+  color: var(--text2);
+}
+.btn.secondary:hover { background: var(--border); }
+.btn.success { background: var(--ok); }
+.btn.success:hover { background: #15803d; }
+.btn.warn { background: var(--warn); }
+.btn.warn:hover { background: #b45309; }
+.btn.ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.btn.ghost:hover { background: var(--bg3); color: var(--text2); }
+.result {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: pre-wrap;
+  font-family: "SF Mono", Monaco, Consolas, monospace;
+  border: 1px solid;
+}
+.result.success {
+  background: var(--ok-bg);
+  border-color: #86efac;
+  color: #14532d;
+}
+.result.error {
+  background: var(--err-bg);
+  border-color: #fca5a5;
+  color: #7f1d1d;
+}
+.result.info {
+  background: var(--accent-bg);
+  border-color: #93c5fd;
+  color: #1e3a8a;
+}
+.result-header {
+  font-weight: 700;
+  font-family: -apple-system, sans-serif;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.hint {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--warn-bg);
+  border: 1px solid #fde68a;
+  border-left: 3px solid var(--warn);
+  border-radius: 6px;
+  font-size: 13px;
+  color: #78350f;
+  display: none;
+  font-family: "SF Mono", Monaco, monospace;
+}
+.hint.visible { display: block; }
+.hint-label {
+  font-family: -apple-system, sans-serif;
+  font-weight: 700;
+  margin-bottom: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.welcome {
+  max-width: 640px;
+  margin: 20px auto;
+  padding: 32px;
+  background: var(--bg2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.welcome h2 {
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.welcome ul { padding-left: 20px; }
+.welcome li { margin-bottom: 6px; }
+.welcome .badge {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.lesson-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  gap: 12px;
+}
+.lesson-nav .btn {
+  max-width: 48%;
+  text-align: left;
+}
+.kbd {
+  background: var(--bg3);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+.spinner-inline {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.api-info {
+  background: var(--accent-bg);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text2);
+  border: 1px solid #bfdbfe;
+}
+.api-info strong { color: var(--accent); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+@media (max-width: 768px) {
+  body { flex-direction: column; }
+  #sidebar { width: 100%; min-width: 0; max-height: 220px; }
+  #main { padding: 18px; }
+}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <h1>🐍 Python для аналітика</h1>
+  <p class="subtitle">Інтерактивний тренажер</p>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+  <div class="progress-text" id="progressText">0 / 0 вправ виконано</div>
+  <nav id="nav"></nav>
+  <div style="padding: 16px; margin-top: 20px; border-top: 1px solid var(--border);">
+    <button class="btn ghost" id="resetBtn" style="width: 100%; font-size: 11px;">Скинути прогрес</button>
+  </div>
+</aside>
+
+<main id="main">
+  <div class="welcome">
+    <div class="badge">🚀 Ласкаво просимо</div>
+    <h2>Python тренажер для дата-аналітика</h2>
+    <p>Обери урок зліва, щоб почати навчання. Кожен урок містить теорію, приклади та інтерактивні вправи з реальним виконанням Python-коду.</p>
+    
+    <h4 style="margin-top: 20px;">Як це працює:</h4>
+    <ul>
+      <li>📖 Читай теорію та приклади</li>
+      <li>✏️ Пиши код у редакторі</li>
+      <li>▶️ Натисни <strong>Виконати</strong> (або <span class="kbd">Ctrl+Enter</span>) — Claude AI виконає твій код</li>
+      <li>✅ <strong>Перевір</strong> результат — звіриться з очікуваним виводом</li>
+      <li>💾 Прогрес та код автоматично зберігаються</li>
+    </ul>
+    
+    <div class="api-info" style="margin-top: 20px;">
+      <strong>⚡ Як виконується код:</strong> Твій Python-код передається Claude (Sonnet 4) через Anthropic API. Claude симулює виконання повністю — підтримуються <code>NumPy</code>, <code>Pandas</code> та вся стандартна бібліотека. Кожен запуск займає 2-5 секунд.
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script>
+// ============================================================
+// КУРИКУЛУМ
+// ============================================================
+const curriculum = [
+  {
+    id: 'm1', title: 'МОДУЛЬ 1 · ОСНОВИ',
+    lessons: [
+      {
+        id: 'l1-1', title: '1.1 Змінні та типи даних',
+        theory: `<p>У Python змінна — це ім'я, що посилається на значення. Тип визначається автоматично. Основні типи: <code>int</code> (цілі), <code>float</code> (дробові), <code>str</code> (рядки), <code>bool</code> (True/False), <code>None</code> (відсутність значення).</p>
+<p>Перевірити тип можна функцією <code>type()</code>. Конвертувати між типами: <code>int()</code>, <code>float()</code>, <code>str()</code>, <code>bool()</code>.</p>
+<p>Імена змінних: латиниця, цифри, підкреслення; не починаються з цифри. Конвенція — <code>snake_case</code>.</p>`,
+        examples: [
+          { code: `# Базові типи\nage = 30           # int\nprice = 19.99      # float\nname = "Іван"      # str\nactive = True      # bool\n\nprint(type(age), type(price), type(name), type(active))`,
+            output: `<class 'int'> <class 'float'> <class 'str'> <class 'bool'>` },
+          { code: `# Конвертація типів\nx = "42"\nn = int(x)\nprint(n + 8)\n\n# float -> int відкидає дробову частину\nprint(int(3.99))\n\n# Будь-яке непорожнє значення -> True\nprint(bool(""), bool("text"), bool(0), bool(1))`,
+            output: `50\n3\nFalse True False True` },
+          { code: `# Кілька присвоєнь одночасно\nx, y, z = 1, 2, 3\nprint(x + y + z)\n\n# Обмін значеннями без temp-змінної\na, b = 10, 20\na, b = b, a\nprint(a, b)`,
+            output: `6\n20 10` },
+          { code: `# f-strings - найзручніший спосіб форматування\nname = "Олена"\nsales = 12500\nprint(f"{name} продала на суму {sales} грн")\n\n# Округлення в f-string\npi = 3.14159265\nprint(f"π ≈ {pi:.2f}")`,
+            output: `Олена продала на суму 12500 грн\nπ ≈ 3.14` }
+        ],
+        exercises: [
+          { task: 'Створи змінну <code>revenue</code> зі значенням <code>150000</code> і виведи її тип.', starter: 'revenue = \n# виведи тип\n', expected: "<class 'int'>", hint: 'revenue = 150000\nprint(type(revenue))' },
+          { task: 'Конвертуй рядок <code>"3.14"</code> у число типу float, помнож на 2 і виведи результат.', starter: 'x = "3.14"\n# твій код\n', expected: '6.28', hint: 'print(float(x) * 2)' },
+          { task: 'Створи дві змінні <code>a = 5</code> і <code>b = 7</code>. Обміняй їх значеннями і виведи через пробіл.', starter: 'a = 5\nb = 7\n# обміняй і виведи\n', expected: '7 5', hint: 'a, b = b, a\nprint(a, b)' },
+          { task: 'Зміннi <code>price = 1299.5</code> і <code>qty = 3</code>. Виведи фразу: <code>Сума: 3898.50 грн</code> (з двома знаками після коми).', starter: 'price = 1299.5\nqty = 3\n# твій код\n', expected: 'Сума: 3898.50 грн', hint: 'print(f"Сума: {price*qty:.2f} грн")' },
+          { task: 'Дано <code>x = "100"</code>. Конвертуй у int, додай 50 і виведи результат.', starter: 'x = "100"\n# твій код\n', expected: '150', hint: 'print(int(x) + 50)' },
+          { task: 'Перевір, що повертає <code>bool()</code> для пустого рядка, нуля, числа 0.0 та порожнього списку <code>[]</code>. Виведи усі чотири значення через пробіл.', starter: '# твій код\n', expected: 'False False False False', hint: 'print(bool(""), bool(0), bool(0.0), bool([]))' }
+        ]
+      },
+      {
+        id: 'l1-2', title: '1.2 Рядки (strings)',
+        theory: `<p>Рядки в Python — послідовності символів у лапках (одинарних або подвійних). До них можна звертатися за індексом: <code>s[0]</code> — перший символ, <code>s[-1]</code> — останній.</p>
+<p>Зрізи (slicing): <code>s[1:4]</code> — символи з 1 по 3 включно, <code>s[:5]</code> — перші 5, <code>s[::-1]</code> — зворотний порядок.</p>
+<p>Корисні методи: <code>.lower()</code>, <code>.upper()</code>, <code>.strip()</code>, <code>.replace()</code>, <code>.split()</code>, <code>.join()</code>, <code>.startswith()</code>, <code>.find()</code>.</p>`,
+        examples: [
+          { code: `s = "Data Analyst"\nprint(s[0])        # перший символ\nprint(s[-1])       # останній\nprint(s[5:])       # від індексу 5 до кінця\nprint(s[:4])       # перші 4\nprint(len(s))      # довжина`,
+            output: `D\nt\nAnalyst\nData\n12` },
+          { code: `email = "  Vitaliy@COMPANY.com  "\nclean = email.strip().lower()\nprint(clean)\n\nprint(clean.endswith("@company.com"))\nprint(clean.replace("@company", "@firm"))`,
+            output: `vitaliy@company.com\nTrue\nvitaliy@firm.com` },
+          { code: `# split + join - дуже корисно для CSV\nrow = "Київ;Одеса;Львів;Харків"\ncities = row.split(";")\nprint(cities)\nprint(len(cities))\n\njoined = " | ".join(cities)\nprint(joined)`,
+            output: `['Київ', 'Одеса', 'Львів', 'Харків']\n4\nКиїв | Одеса | Львів | Харків` },
+          { code: `# Пошук підрядка\ntext = "Sales report 2026 Q1"\nprint("2026" in text)\nprint(text.find("Q1"))     # індекс знайденого\nprint(text.find("Q3"))     # -1 якщо не знайдено\nprint(text.count("e"))     # кількість входжень`,
+            output: `True\n17\n-1\n2` }
+        ],
+        exercises: [
+          { task: 'Дано рядок <code>s = "powerbi"</code>. Виведи перший і останній символи через пробіл.', starter: 's = "powerbi"\n# твій код\n', expected: 'p i', hint: 'print(s[0], s[-1])' },
+          { task: 'Розверни рядок <code>"analyst"</code> у зворотному порядку.', starter: 's = "analyst"\n# твій код\n', expected: 'tsylana', hint: 'print(s[::-1])' },
+          { task: 'Дано <code>email = "  John.Doe@Mail.com  "</code>. Прибери пробіли та переведи у нижній регістр.', starter: 'email = "  John.Doe@Mail.com  "\n# твій код\n', expected: 'john.doe@mail.com', hint: 'print(email.strip().lower())' },
+          { task: 'Дано CSV-рядок <code>"apple,banana,cherry,date"</code>. Виведи кількість елементів.', starter: 'row = "apple,banana,cherry,date"\n# твій код\n', expected: '4', hint: 'print(len(row.split(",")))' },
+          { task: 'Список фруктів <code>fruits = ["apple", "banana", "cherry"]</code>. Об\'єднай їх через " + " і виведи.', starter: 'fruits = ["apple", "banana", "cherry"]\n# твій код\n', expected: 'apple + banana + cherry', hint: 'print(" + ".join(fruits))' },
+          { task: 'У рядку <code>"Sales: 12500 UAH"</code> заміни "UAH" на "₴".', starter: 's = "Sales: 12500 UAH"\n# твій код\n', expected: 'Sales: 12500 ₴', hint: 'print(s.replace("UAH", "₴"))' },
+          { task: 'Підрахуй, скільки разів літера "a" зустрічається в рядку <code>"banana cabana"</code>.', starter: 's = "banana cabana"\n# твій код\n', expected: '6', hint: 'print(s.count("a"))' }
+        ]
+      },
+      {
+        id: 'l1-3', title: '1.3 Числа та оператори',
+        theory: `<p>Арифметика: <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>**</code> (степінь), <code>//</code> (цілочисельне ділення), <code>%</code> (залишок).</p>
+<p>Корисні функції: <code>abs()</code>, <code>round()</code>, <code>min()</code>, <code>max()</code>, <code>sum()</code>, <code>pow()</code>.</p>
+<p>Модуль <code>math</code> має <code>math.sqrt()</code>, <code>math.floor()</code>, <code>math.ceil()</code>, <code>math.pi</code> та інші.</p>`,
+        examples: [
+          { code: `# Основна арифметика\nprint(10 / 3)       # звичайне ділення\nprint(10 // 3)      # цілочисельне\nprint(10 % 3)       # залишок\nprint(2 ** 10)      # степінь\nprint(abs(-15))     # модуль`,
+            output: `3.3333333333333335\n3\n1\n1024\n15` },
+          { code: `# round() з другим аргументом\nx = 3.14159265\nprint(round(x, 2))\nprint(round(x, 4))\nprint(round(1234567, -3))\n\n# Конвертація валют\nusd = 100\nrate = 41.23\nprint(round(usd * rate, 2))`,
+            output: `3.14\n3.1416\n1235000\n4123.0` },
+          { code: `import math\nprint(math.sqrt(144))\nprint(math.floor(7.9))\nprint(math.ceil(7.1))\nprint(math.pi)\nprint(round(math.log(100, 10), 2))`,
+            output: `12.0\n7\n8\n3.141592653589793\n2.0` },
+          { code: `# Відсоток зміни\nold = 10000\nnew = 12500\nchange_pct = (new - old) / old * 100\nprint(f"Зростання: {change_pct:.1f}%")\n\n# Чи парне число\nn = 17\nprint(n % 2 == 0)`,
+            output: `Зростання: 25.0%\nFalse` }
+        ],
+        exercises: [
+          { task: 'Обчисли остачу від ділення 2026 на 7.', starter: '# твій код\n', expected: '3', hint: 'print(2026 % 7)' },
+          { task: 'Обчисли 2 у степені 16.', starter: '# твій код\n', expected: '65536', hint: 'print(2 ** 16)' },
+          { task: 'Округли число <code>123.4567</code> до 2 знаків після коми.', starter: 'x = 123.4567\n# твій код\n', expected: '123.46', hint: 'print(round(x, 2))' },
+          { task: 'Площа кола радіусом 5. Виведи округлене до 2 знаків. (Використай <code>math.pi</code>)', starter: 'import math\nr = 5\n# твій код\n', expected: '78.54', hint: 'print(round(math.pi * r ** 2, 2))' },
+          { task: 'Виведи відсоток зміни від 8000 до 10000 з одним знаком після коми (наприклад <code>25.0%</code>).', starter: 'old = 8000\nnew = 10000\n# твій код\n', expected: '25.0%', hint: 'print(f"{(new-old)/old*100:.1f}%")' },
+          { task: 'Скільки повних годин в 12345 секундах? (цілочисельне ділення)', starter: 'sec = 12345\n# твій код\n', expected: '3', hint: 'print(sec // 3600)' }
+        ]
+      },
+      {
+        id: 'l1-4', title: '1.4 Логічні операції',
+        theory: `<p>Порівняння: <code>==</code> <code>!=</code> <code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code>. Результат — <code>True</code> або <code>False</code>.</p>
+<p>Логічні: <code>and</code> (обидва True), <code>or</code> (хоча б один True), <code>not</code> (заперечення).</p>
+<p>Перевірка членства: <code>in</code>, <code>not in</code>. Працює для рядків, списків, словників.</p>`,
+        examples: [
+          { code: `age = 25\nsalary = 50000\nis_senior = age >= 30 and salary > 80000\nprint(is_senior)\n\n# Ланцюжок порівнянь\nscore = 75\nprint(60 <= score <= 80)`,
+            output: `False\nTrue` },
+          { code: `# in / not in\nname = "Iuliia"\nprint("ii" in name)\nprint("Z" not in name)\n\nallowed = ["admin", "editor", "viewer"]\nrole = "guest"\nprint(role in allowed)`,
+            output: `True\nTrue\nFalse` },
+          { code: `# Тернарний оператор\nx = 15\nstatus = "великий" if x > 10 else "малий"\nprint(status)\n\n# Поєднання умов\nincome = 70000\ntax = 0.18 if income > 50000 else 0.05\nprint(f"Ставка податку: {tax*100:.0f}%")`,
+            output: `великий\nСтавка податку: 18%` }
+        ],
+        exercises: [
+          { task: 'Перевір, чи число 42 більше за 10 і менше за 100. Виведи результат.', starter: 'n = 42\n# твій код\n', expected: 'True', hint: 'print(10 < n < 100)' },
+          { task: 'Дано <code>email = "user@gmail.com"</code>. Перевір, чи є в ньому "@" і чи закінчується на ".com".', starter: 'email = "user@gmail.com"\n# твій код\n', expected: 'True', hint: 'print("@" in email and email.endswith(".com"))' },
+          { task: 'Перевір, чи слово "python" є у списку <code>["sql", "python", "dax"]</code>.', starter: 'tools = ["sql", "python", "dax"]\n# твій код\n', expected: 'True', hint: 'print("python" in tools)' },
+          { task: 'Дано <code>x = 0</code>. Скористайся тернарним оператором, щоб вивести "позитивне", "негативне" або "нуль".', starter: 'x = 0\n# твій код\n', expected: 'нуль', hint: 'print("позитивне" if x > 0 else "негативне" if x < 0 else "нуль")' },
+          { task: 'Користувач має <code>age = 22</code> і <code>has_license = True</code>. Виведи True, якщо обидві умови виконано: вік ≥ 18 і є ліцензія.', starter: 'age = 22\nhas_license = True\n# твій код\n', expected: 'True', hint: 'print(age >= 18 and has_license)' },
+          { task: 'Дано <code>password = ""</code>. Перевір, чи пароль "пустий" (через bool). Має вивести True.', starter: 'password = ""\n# твій код\n', expected: 'True', hint: 'print(not password)' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'm2', title: 'МОДУЛЬ 2 · КОЛЕКЦІЇ',
+    lessons: [
+      {
+        id: 'l2-1', title: '2.1 Списки (lists)',
+        theory: `<p>Список — впорядкована, змінювана колекція: <code>[1, 2, 3]</code>. Може містити різні типи.</p>
+<p>Додавання: <code>.append(x)</code> (в кінець), <code>.insert(i, x)</code>, <code>.extend([...])</code>. Видалення: <code>.remove(x)</code>, <code>.pop(i)</code>, <code>del lst[i]</code>.</p>
+<p>Сортування: <code>.sort()</code> (на місці), <code>sorted(lst)</code> (нова копія). Реверс: <code>.reverse()</code> або <code>[::-1]</code>.</p>`,
+        examples: [
+          { code: `sales = [120, 350, 80, 410, 290]\nprint(sum(sales))\nprint(max(sales))\nprint(min(sales))\nprint(round(sum(sales) / len(sales), 1))`,
+            output: `1250\n410\n80\n250.0` },
+          { code: `cities = ["Київ", "Львів"]\ncities.append("Одеса")\ncities.insert(1, "Харків")\nprint(cities)\n\ncities.remove("Львів")\nprint(cities)\n\nlast = cities.pop()\nprint("Видалили:", last)\nprint(cities)`,
+            output: `['Київ', 'Харків', 'Львів', 'Одеса']\n['Київ', 'Харків', 'Одеса']\nВидалили: Одеса\n['Київ', 'Харків']` },
+          { code: `# Сортування\nnums = [5, 2, 8, 1, 9, 3]\nprint(sorted(nums))\nprint(sorted(nums, reverse=True))\n\nwords = ["banana", "Apple", "cherry"]\nprint(sorted(words, key=str.lower))`,
+            output: `[1, 2, 3, 5, 8, 9]\n[9, 8, 5, 3, 2, 1]\n['Apple', 'banana', 'cherry']` },
+          { code: `# Зрізи + копіювання\nnums = [10, 20, 30, 40, 50, 60]\nprint(nums[1:4])\nprint(nums[:3])\nprint(nums[-2:])\nprint(nums[::2])`,
+            output: `[20, 30, 40]\n[10, 20, 30]\n[50, 60]\n[10, 30, 50]` }
+        ],
+        exercises: [
+          { task: 'Створи список з чисел 1, 2, 3, 4, 5 і виведи їх суму.', starter: 'nums = \n# твій код\n', expected: '15', hint: 'nums = [1,2,3,4,5]\nprint(sum(nums))' },
+          { task: 'Дано <code>sales = [120, 350, 80, 410, 290]</code>. Знайди середнє арифметичне (округли до 1 знака).', starter: 'sales = [120, 350, 80, 410, 290]\n# твій код\n', expected: '250.0', hint: 'print(round(sum(sales)/len(sales), 1))' },
+          { task: 'У список <code>["сік", "хліб"]</code> додай "молоко" в кінець і "вода" на початок. Виведи список.', starter: 'items = ["сік", "хліб"]\n# твій код\n', expected: "['вода', 'сік', 'хліб', 'молоко']", hint: 'items.append("молоко")\nitems.insert(0, "вода")\nprint(items)' },
+          { task: 'Відсортуй список <code>[3.5, 1.2, 4.8, 2.1]</code> за спаданням.', starter: 'arr = [3.5, 1.2, 4.8, 2.1]\n# твій код\n', expected: '[4.8, 3.5, 2.1, 1.2]', hint: 'print(sorted(arr, reverse=True))' },
+          { task: 'Виведи останні 3 елементи списку <code>[10, 20, 30, 40, 50, 60, 70]</code>.', starter: 'lst = [10, 20, 30, 40, 50, 60, 70]\n# твій код\n', expected: '[50, 60, 70]', hint: 'print(lst[-3:])' },
+          { task: 'Дано список <code>scores = [85, 92, 78, 91, 64]</code>. Виведи різницю між максимальним і мінімальним значеннями.', starter: 'scores = [85, 92, 78, 91, 64]\n# твій код\n', expected: '28', hint: 'print(max(scores) - min(scores))' },
+          { task: 'Видали з <code>[1, 2, 3, 4, 5]</code> елемент 3 і виведи список.', starter: 'lst = [1, 2, 3, 4, 5]\n# твій код\n', expected: '[1, 2, 4, 5]', hint: 'lst.remove(3)\nprint(lst)' }
+        ]
+      },
+      {
+        id: 'l2-2', title: '2.2 Словники (dicts)',
+        theory: `<p>Словник — колекція пар "ключ-значення": <code>{"name": "Іван", "age": 30}</code>. Доступ за ключем: <code>d["name"]</code>.</p>
+<p>Безпечний доступ: <code>d.get("key", default)</code> — не падає, якщо ключа немає.</p>
+<p>Корисні методи: <code>.keys()</code>, <code>.values()</code>, <code>.items()</code>, <code>.update({...})</code>, <code>.pop("key")</code>.</p>`,
+        examples: [
+          { code: `user = {"name": "Олена", "age": 28, "city": "Львів"}\nprint(user["name"])\nprint(user.get("email", "не вказано"))\n\nuser["email"] = "olena@mail.com"\nuser["age"] = 29\nprint(user)`,
+            output: `Олена\nне вказано\n{'name': 'Олена', 'age': 29, 'city': 'Львів', 'email': 'olena@mail.com'}` },
+          { code: `prices = {"кава": 45, "чай": 30, "сік": 25}\nfor key, value in prices.items():\n    print(f"{key}: {value} грн")\n\nprint("Сума:", sum(prices.values()))`,
+            output: `кава: 45 грн\nчай: 30 грн\nсік: 25 грн\nСума: 100` },
+          { code: `# Підрахунок частоти\nwords = ["sql", "python", "sql", "dax", "python", "sql"]\ncounts = {}\nfor w in words:\n    counts[w] = counts.get(w, 0) + 1\nprint(counts)`,
+            output: `{'sql': 3, 'python': 2, 'dax': 1}` },
+          { code: `# Вкладені словники\nemployees = {\n    "E001": {"name": "Іван", "salary": 50000},\n    "E002": {"name": "Олена", "salary": 65000}\n}\nprint(employees["E002"]["name"])\nprint(employees["E001"]["salary"])`,
+            output: `Олена\n50000` }
+        ],
+        exercises: [
+          { task: 'Створи словник <code>person</code> з ключами "name" = "Ivan" і "age" = 30. Виведи його.', starter: '# твій код\n', expected: "{'name': 'Ivan', 'age': 30}", hint: 'person = {"name": "Ivan", "age": 30}\nprint(person)' },
+          { task: 'Дано <code>d = {"a": 1, "b": 2, "c": 3}</code>. Виведи суму всіх значень.', starter: 'd = {"a": 1, "b": 2, "c": 3}\n# твій код\n', expected: '6', hint: 'print(sum(d.values()))' },
+          { task: 'У словник <code>{"hello": "Привіт"}</code> додай пару "bye" → "Бувай" і виведи словник.', starter: 'd = {"hello": "Привіт"}\n# твій код\n', expected: "{'hello': 'Привіт', 'bye': 'Бувай'}", hint: 'd["bye"] = "Бувай"\nprint(d)' },
+          { task: 'Безпечно отримай значення для ключа "phone" зі словника <code>{"name": "Олег"}</code>. Якщо ключа немає, поверни "—".', starter: 'd = {"name": "Олег"}\n# твій код\n', expected: '—', hint: 'print(d.get("phone", "—"))' },
+          { task: 'Дано список <code>["a", "b", "a", "c", "b", "a"]</code>. Підрахуй, скільки разів кожна літера зустрічається. Виведи словник.', starter: 'letters = ["a", "b", "a", "c", "b", "a"]\n# твій код\n', expected: "{'a': 3, 'b': 2, 'c': 1}", hint: 'counts = {}\nfor ch in letters:\n    counts[ch] = counts.get(ch, 0) + 1\nprint(counts)' },
+          { task: 'Знайди ключ з максимальним значенням у словнику <code>{"x": 10, "y": 45, "z": 23}</code>.', starter: 'd = {"x": 10, "y": 45, "z": 23}\n# твій код\n', expected: 'y', hint: 'print(max(d, key=d.get))' }
+        ]
+      },
+      {
+        id: 'l2-3', title: '2.3 Кортежі та множини',
+        theory: `<p><strong>Кортеж (tuple)</strong> — як список, але незмінний: <code>(1, 2, 3)</code>. Швидший і безпечніший, коли дані не мають змінюватись.</p>
+<p><strong>Множина (set)</strong> — невпорядкована колекція унікальних значень: <code>{1, 2, 3}</code>. Швидкий пошук членства, видалення дублікатів.</p>
+<p>Операції над множинами: <code>|</code> (об'єднання), <code>&</code> (перетин), <code>-</code> (різниця).</p>`,
+        examples: [
+          { code: `# Tuple - незмінний\npoint = (10, 20)\nx, y = point\nprint(x, y)\n\ndef stats(nums):\n    return min(nums), max(nums), sum(nums)/len(nums)\n\nlo, hi, avg = stats([5, 8, 12, 3, 9])\nprint(lo, hi, avg)`,
+            output: `10 20\n3 12 7.4` },
+          { code: `nums = [1, 2, 2, 3, 3, 3, 4]\nunique = set(nums)\nprint(unique)\nprint(len(unique))\n\nallowed = {"admin", "editor", "viewer"}\nprint("admin" in allowed)`,
+            output: `{1, 2, 3, 4}\n4\nTrue` },
+          { code: `a = {1, 2, 3, 4, 5}\nb = {4, 5, 6, 7, 8}\nprint(a | b)\nprint(a & b)\nprint(a - b)\nprint(a ^ b)`,
+            output: `{1, 2, 3, 4, 5, 6, 7, 8}\n{4, 5}\n{1, 2, 3}\n{1, 2, 3, 6, 7, 8}` },
+          { code: `# Дедуплікація + збереження порядку\nemails = ["a@x.com", "b@x.com", "a@x.com", "c@x.com", "b@x.com"]\nunique = list(dict.fromkeys(emails))\nprint(unique)`,
+            output: `['a@x.com', 'b@x.com', 'c@x.com']` }
+        ],
+        exercises: [
+          { task: 'Створи tuple з трьох чисел: 10, 20, 30. Розпакуй в три змінні a, b, c і виведи їх суму.', starter: '# твій код\n', expected: '60', hint: 'a, b, c = (10, 20, 30)\nprint(a + b + c)' },
+          { task: 'Прибери дублікати зі списку <code>[1, 2, 2, 3, 3, 3, 4, 4]</code>. Виведи відсортований список.', starter: 'lst = [1, 2, 2, 3, 3, 3, 4, 4]\n# твій код\n', expected: '[1, 2, 3, 4]', hint: 'print(sorted(set(lst)))' },
+          { task: 'Знайди спільні елементи двох списків: <code>[1,2,3,4]</code> та <code>[3,4,5,6]</code>. Виведи відсортований список.', starter: 'a = [1, 2, 3, 4]\nb = [3, 4, 5, 6]\n# твій код\n', expected: '[3, 4]', hint: 'print(sorted(set(a) & set(b)))' },
+          { task: 'Знайди елементи, які є тільки в першому списку <code>[10, 20, 30, 40]</code>, але не в другому <code>[30, 40, 50]</code>.', starter: 'a = [10, 20, 30, 40]\nb = [30, 40, 50]\n# твій код\n', expected: '[10, 20]', hint: 'print(sorted(set(a) - set(b)))' },
+          { task: 'Перевір, чи є елемент "Київ" у tuple <code>("Львів", "Київ", "Одеса")</code>.', starter: 't = ("Львів", "Київ", "Одеса")\n# твій код\n', expected: 'True', hint: 'print("Київ" in t)' },
+          { task: 'Скільки унікальних символів у рядку <code>"data analytics"</code> (включаючи пробіл)?', starter: 's = "data analytics"\n# твій код\n', expected: '9', hint: 'print(len(set(s)))' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'm3', title: 'МОДУЛЬ 3 · КЕРУВАННЯ ПОТОКОМ',
+    lessons: [
+      {
+        id: 'l3-1', title: '3.1 Умовні оператори',
+        theory: `<p>Конструкція: <code>if condition:</code> ... <code>elif other:</code> ... <code>else:</code> ...</p>
+<p>Відступи в Python — це синтаксис, не косметика. Стандарт — 4 пробіли.</p>
+<p>Перевірки можна об'єднувати: <code>if x &gt; 0 and y &gt; 0:</code>. Тернарний оператор: <code>value = a if cond else b</code>.</p>`,
+        examples: [
+          { code: `score = 78\nif score >= 90:\n    grade = "A"\nelif score >= 75:\n    grade = "B"\nelif score >= 60:\n    grade = "C"\nelse:\n    grade = "F"\nprint(grade)`,
+            output: `B` },
+          { code: `# Класифікація транзакцій\namount = 12500\ncurrency = "UAH"\n\nif currency == "UAH":\n    if amount >= 10000:\n        category = "VIP"\n    elif amount >= 1000:\n        category = "Standard"\n    else:\n        category = "Small"\nelse:\n    category = "Foreign"\nprint(category)`,
+            output: `VIP` },
+          { code: `email = "user@company.com"\n\nif not email:\n    print("ERROR: empty")\nelif "@" not in email:\n    print("ERROR: no @")\nelif not email.endswith(".com"):\n    print("ERROR: not .com")\nelse:\n    print("OK")`,
+            output: `OK` }
+        ],
+        exercises: [
+          { task: 'Дано <code>n = 7</code>. Виведи "парне" або "непарне".', starter: 'n = 7\n# твій код\n', expected: 'непарне', hint: 'print("парне" if n % 2 == 0 else "непарне")' },
+          { task: 'Дано <code>temp = 22</code>. Виведи "холодно" (<10), "тепло" (10-25), "спекотно" (>25).', starter: 'temp = 22\n# твій код\n', expected: 'тепло', hint: 'if temp < 10: print("холодно")\nelif temp <= 25: print("тепло")\nelse: print("спекотно")' },
+          { task: 'Дано <code>age = 17</code>. Виведи "так" якщо вік від 18 до 65 включно, інакше "ні".', starter: 'age = 17\n# твій код\n', expected: 'ні', hint: 'print("так" if 18 <= age <= 65 else "ні")' },
+          { task: 'Знижка: якщо сума замовлення ≥ 5000, знижка 10%, якщо ≥ 1000 — 5%, інакше 0%. Дано <code>amount = 2500</code>. Виведи фінальну суму як ціле.', starter: 'amount = 2500\n# твій код\n', expected: '2375', hint: 'if amount >= 5000: d = 0.1\nelif amount >= 1000: d = 0.05\nelse: d = 0\nprint(int(amount * (1 - d)))' },
+          { task: 'Перевір, чи рік <code>year = 2024</code> високосний. Виведи True/False. Правило: ділиться на 4, АЛЕ якщо ділиться на 100, то має ділитись на 400.', starter: 'year = 2024\n# твій код\n', expected: 'True', hint: 'print((year % 4 == 0 and year % 100 != 0) or year % 400 == 0)' },
+          { task: 'Дано <code>password = "abc123"</code>. Виведи "сильний" якщо довжина ≥ 8 і є хоча б одна цифра, інакше "слабкий".', starter: 'password = "abc123"\n# твій код\n', expected: 'слабкий', hint: 'has_digit = any(ch.isdigit() for ch in password)\nprint("сильний" if len(password) >= 8 and has_digit else "слабкий")' }
+        ]
+      },
+      {
+        id: 'l3-2', title: '3.2 Цикли for',
+        theory: `<p><code>for x in iterable:</code> — проходить по елементах. Працює зі списками, рядками, словниками, range.</p>
+<p><code>range(stop)</code>, <code>range(start, stop)</code>, <code>range(start, stop, step)</code> — генерує послідовність чисел.</p>
+<p>Корисні: <code>enumerate(lst)</code> — пари (індекс, значення); <code>zip(a, b)</code> — пари з двох послідовностей.</p>
+<p>Керування: <code>break</code> — вийти з циклу, <code>continue</code> — наступна ітерація.</p>`,
+        examples: [
+          { code: `# range\nfor i in range(5):\n    print(i, end=" ")\nprint()\nfor i in range(2, 8):\n    print(i, end=" ")\nprint()\nfor i in range(0, 20, 5):\n    print(i, end=" ")`,
+            output: `0 1 2 3 4 \n2 3 4 5 6 7 \n0 5 10 15 ` },
+          { code: `fruits = ["apple", "banana", "cherry"]\nfor i, name in enumerate(fruits, start=1):\n    print(f"{i}. {name}")`,
+            output: `1. apple\n2. banana\n3. cherry` },
+          { code: `names = ["Іван", "Олена", "Петро"]\nages = [30, 25, 40]\nfor n, a in zip(names, ages):\n    print(f"{n} - {a}")`,
+            output: `Іван - 30\nОлена - 25\nПетро - 40` },
+          { code: `total = 0\nfor n in [5, 12, -3, 8, 0, 20, -1]:\n    if n < 0:\n        continue\n    if total > 30:\n        break\n    total += n\nprint(total)`,
+            output: `45` }
+        ],
+        exercises: [
+          { task: 'Виведи суму чисел від 1 до 100 (включно).', starter: '# твій код\n', expected: '5050', hint: 'print(sum(range(1, 101)))' },
+          { task: 'Виведи всі парні числа від 0 до 20 (включно) через пробіл в одному рядку.', starter: '# твій код\n', expected: '0 2 4 6 8 10 12 14 16 18 20 ', hint: 'for i in range(0, 21, 2):\n    print(i, end=" ")' },
+          { task: 'Список <code>prices = [120, 250, 80, 400]</code>. Виведи кожну ціну у форматі: <code>Товар 1: 120</code> (з нумерацією від 1).', starter: 'prices = [120, 250, 80, 400]\n# твій код\n', expected: 'Товар 1: 120\nТовар 2: 250\nТовар 3: 80\nТовар 4: 400', hint: 'for i, p in enumerate(prices, 1):\n    print(f"Товар {i}: {p}")' },
+          { task: 'Маємо два списки: <code>products = ["хліб", "сік"]</code> і <code>qty = [3, 2]</code>. Виведи фрази: <code>хліб x 3</code> і <code>сік x 2</code>.', starter: 'products = ["хліб", "сік"]\nqty = [3, 2]\n# твій код\n', expected: 'хліб x 3\nсік x 2', hint: 'for p, q in zip(products, qty):\n    print(f"{p} x {q}")' },
+          { task: 'Підрахуй кількість голосних (a, e, i, o, u) у рядку <code>"data analytics"</code>.', starter: 's = "data analytics"\n# твій код\n', expected: '5', hint: 'count = 0\nfor ch in s:\n    if ch in "aeiou":\n        count += 1\nprint(count)' },
+          { task: 'З <code>[10, -5, 8, -2, 15, -7, 3]</code> виведи список тільки додатних чисел.', starter: 'nums = [10, -5, 8, -2, 15, -7, 3]\n# твій код\n', expected: '[10, 8, 15, 3]', hint: 'positives = []\nfor n in nums:\n    if n > 0:\n        positives.append(n)\nprint(positives)' },
+          { task: 'Знайди перше число у списку <code>[3, 7, 12, 18, 24, 35]</code>, що більше за 15, і виведи його (використай break).', starter: 'nums = [3, 7, 12, 18, 24, 35]\n# твій код\n', expected: '18', hint: 'for n in nums:\n    if n > 15:\n        print(n)\n        break' }
+        ]
+      },
+      {
+        id: 'l3-3', title: '3.3 Comprehensions',
+        theory: `<p>List comprehension — компактна форма створення списку: <code>[expr for x in iterable]</code>.</p>
+<p>З умовою: <code>[expr for x in iterable if cond]</code>.</p>
+<p>Dict comprehension: <code>{k: v for ...}</code>. Set comprehension: <code>{expr for ...}</code>.</p>`,
+        examples: [
+          { code: `squares = [x ** 2 for x in range(1, 6)]\nprint(squares)\n\nevens = [x for x in range(20) if x % 2 == 0]\nprint(evens)`,
+            output: `[1, 4, 9, 16, 25]\n[0, 2, 4, 6, 8, 10, 12, 14, 16, 18]` },
+          { code: `names = ["  Ivan  ", "OLENA", "petro"]\nclean = [n.strip().title() for n in names]\nprint(clean)\n\nwords = ["data", "analytics", "is", "fun"]\nlengths = [len(w) for w in words]\nprint(lengths)`,
+            output: `['Ivan', 'Olena', 'Petro']\n[4, 9, 2, 3]` },
+          { code: `prices = {"кава": 45, "чай": 30, "сік": 25}\nwith_tax = {k: round(v * 1.2, 2) for k, v in prices.items()}\nprint(with_tax)\n\ninv = {v: k for k, v in prices.items()}\nprint(inv)`,
+            output: `{'кава': 54.0, 'чай': 36.0, 'сік': 30.0}\n{45: 'кава', 30: 'чай', 25: 'сік'}` },
+          { code: `nums = [-5, 3, -1, 8, -2, 10]\nresult = ["+" if n > 0 else "-" for n in nums]\nprint(result)\n\nmatrix = [[i*j for j in range(1, 4)] for i in range(1, 4)]\nfor row in matrix:\n    print(row)`,
+            output: `['-', '+', '-', '+', '-', '+']\n[1, 2, 3]\n[2, 4, 6]\n[3, 6, 9]` }
+        ],
+        exercises: [
+          { task: 'Створи список квадратів чисел від 1 до 10.', starter: '# твій код\n', expected: '[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]', hint: 'print([x**2 for x in range(1, 11)])' },
+          { task: 'Зі списку <code>[12, 7, 23, 4, 18, 9, 35]</code> отримай тільки ті, що більше 10.', starter: 'nums = [12, 7, 23, 4, 18, 9, 35]\n# твій код\n', expected: '[12, 23, 18, 35]', hint: 'print([n for n in nums if n > 10])' },
+          { task: 'З <code>["apple", "BANANA", "Cherry"]</code> отримай список у нижньому регістрі.', starter: 'fruits = ["apple", "BANANA", "Cherry"]\n# твій код\n', expected: "['apple', 'banana', 'cherry']", hint: 'print([f.lower() for f in fruits])' },
+          { task: 'Зі словника <code>{"a": 5, "b": 12, "c": 8, "d": 20}</code> залиш тільки пари, де значення > 10.', starter: 'd = {"a": 5, "b": 12, "c": 8, "d": 20}\n# твій код\n', expected: "{'b': 12, 'd': 20}", hint: 'print({k: v for k, v in d.items() if v > 10})' },
+          { task: 'Зі списку чисел <code>[5, -3, 8, -1, 0, 7, -4]</code> створи список їх абсолютних значень.', starter: 'nums = [5, -3, 8, -1, 0, 7, -4]\n# твій код\n', expected: '[5, 3, 8, 1, 0, 7, 4]', hint: 'print([abs(n) for n in nums])' },
+          { task: 'Створи словник, де ключ — число від 1 до 5, значення — його куб.', starter: '# твій код\n', expected: '{1: 1, 2: 8, 3: 27, 4: 64, 5: 125}', hint: 'print({x: x**3 for x in range(1, 6)})' },
+          { task: 'З двох списків <code>keys = ["a","b","c"]</code> і <code>vals = [10, 20, 30]</code> зроби словник.', starter: 'keys = ["a", "b", "c"]\nvals = [10, 20, 30]\n# твій код\n', expected: "{'a': 10, 'b': 20, 'c': 30}", hint: 'print({k: v for k, v in zip(keys, vals)})' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'm4', title: 'МОДУЛЬ 4 · ФУНКЦІЇ',
+    lessons: [
+      {
+        id: 'l4-1', title: '4.1 Створення функцій',
+        theory: `<p>Функція оголошується через <code>def</code>: <code>def name(args): ...</code>. Повертає значення через <code>return</code>.</p>
+<p>Аргументи можуть мати значення за замовчуванням: <code>def f(x, y=10):</code>. Можна передавати позиційно або за іменем.</p>`,
+        examples: [
+          { code: `def avg(numbers):\n    """Повертає середнє арифметичне."""\n    return sum(numbers) / len(numbers)\n\nprint(avg([10, 20, 30]))\nprint(avg([5, 15, 25, 35, 45]))`,
+            output: `20.0\n25.0` },
+          { code: `def discount_price(price, discount=0.1):\n    return price * (1 - discount)\n\nprint(discount_price(1000))\nprint(discount_price(1000, 0.25))\nprint(discount_price(1000, discount=0.5))`,
+            output: `900.0\n750.0\n500.0` },
+          { code: `def stats(nums):\n    return min(nums), max(nums), sum(nums) / len(nums)\n\nlo, hi, mean = stats([3, 7, 2, 9, 4])\nprint(f"min={lo}, max={hi}, avg={mean}")`,
+            output: `min=2, max=9, avg=5.0` },
+          { code: `def sum_all(*nums):\n    return sum(nums)\n\nprint(sum_all(1, 2, 3))\nprint(sum_all(10, 20, 30, 40, 50))\n\ndef build_user(**fields):\n    return fields\n\nprint(build_user(name="Іван", age=30, city="Київ"))`,
+            output: `6\n150\n{'name': 'Іван', 'age': 30, 'city': 'Київ'}` }
+        ],
+        exercises: [
+          { task: 'Напиши функцію <code>square(x)</code>, що повертає квадрат числа. Виклич з 7.', starter: 'def square(x):\n    pass\nprint(square(7))\n', expected: '49', hint: 'def square(x):\n    return x * x\nprint(square(7))' },
+          { task: 'Функція <code>greet(name)</code> повертає рядок "Привіт, {name}!". Виклич з "Іван".', starter: 'def greet(name):\n    pass\nprint(greet("Іван"))\n', expected: 'Привіт, Іван!', hint: 'def greet(name):\n    return f"Привіт, {name}!"' },
+          { task: 'Функція <code>is_even(n)</code> повертає True/False. Виклич з 10.', starter: 'def is_even(n):\n    pass\nprint(is_even(10))\n', expected: 'True', hint: 'def is_even(n):\n    return n % 2 == 0' },
+          { task: 'Функція <code>vat(price, rate=0.2)</code> повертає ціну з ПДВ (price + price*rate). Виклич з price=100.', starter: 'def vat(price, rate=0.2):\n    pass\nprint(vat(100))\n', expected: '120.0', hint: 'def vat(price, rate=0.2):\n    return price * (1 + rate)' },
+          { task: 'Функція <code>fizzbuzz(n)</code>: повертає "Fizz" якщо n%3==0, "Buzz" якщо n%5==0, "FizzBuzz" якщо обидва, інакше str(n). Виклич з 15.', starter: 'def fizzbuzz(n):\n    pass\nprint(fizzbuzz(15))\n', expected: 'FizzBuzz', hint: 'def fizzbuzz(n):\n    if n % 15 == 0: return "FizzBuzz"\n    if n % 3 == 0: return "Fizz"\n    if n % 5 == 0: return "Buzz"\n    return str(n)' },
+          { task: 'Функція <code>safe_div(a, b)</code> повертає a/b, але якщо b == 0 повертає <code>None</code>. Виклич з safe_div(10, 0).', starter: 'def safe_div(a, b):\n    pass\nprint(safe_div(10, 0))\n', expected: 'None', hint: 'def safe_div(a, b):\n    return None if b == 0 else a / b' },
+          { task: 'Функція <code>average(*nums)</code> приймає довільну кількість чисел і повертає середнє. Виклич з average(2, 4, 6, 8).', starter: 'def average(*nums):\n    pass\nprint(average(2, 4, 6, 8))\n', expected: '5.0', hint: 'def average(*nums):\n    return sum(nums) / len(nums)' }
+        ]
+      },
+      {
+        id: 'l4-2', title: '4.2 Lambda, map, filter',
+        theory: `<p><code>lambda</code> — анонімна функція в одному рядку: <code>lambda x: x * 2</code>.</p>
+<p><code>map(func, iterable)</code> — застосовує функцію до кожного елемента.</p>
+<p><code>filter(func, iterable)</code> — залишає тільки ті, для яких func(x) повертає True.</p>`,
+        examples: [
+          { code: `square = lambda x: x ** 2\nprint(square(5))\n\nnums = [1, 2, 3, 4, 5]\nresult = list(map(lambda x: x * 10, nums))\nprint(result)`,
+            output: `25\n[10, 20, 30, 40, 50]` },
+          { code: `nums = [1, 2, 3, 4, 5, 6, 7, 8]\nevens = list(filter(lambda x: x % 2 == 0, nums))\nprint(evens)\n\nwords = ["apple", "ai", "data", "ml", "analytics"]\nlong_words = list(filter(lambda w: len(w) > 3, words))\nprint(long_words)`,
+            output: `[2, 4, 6, 8]\n['apple', 'data', 'analytics']` },
+          { code: `employees = [\n    {"name": "Ivan", "salary": 50000},\n    {"name": "Olena", "salary": 75000},\n    {"name": "Petro", "salary": 60000}\n]\nby_salary = sorted(employees, key=lambda e: e["salary"], reverse=True)\nfor e in by_salary:\n    print(e["name"], e["salary"])`,
+            output: `Olena 75000\nPetro 60000\nIvan 50000` },
+          { code: `data = [("apple", 3), ("banana", 1), ("cherry", 2)]\nprint(sorted(data, key=lambda x: x[1]))\n\nwords = ["data", "ai", "analytics", "ml"]\nprint(sorted(words, key=len))`,
+            output: `[('banana', 1), ('cherry', 2), ('apple', 3)]\n['ai', 'ml', 'data', 'analytics']` }
+        ],
+        exercises: [
+          { task: 'Створи lambda <code>cube</code>, що повертає куб числа. Виклич з 4.', starter: 'cube = lambda \nprint(cube(4))\n', expected: '64', hint: 'cube = lambda x: x ** 3\nprint(cube(4))' },
+          { task: 'Використай map+lambda, щоб подвоїти кожне число у <code>[1, 2, 3, 4]</code>. Виведи як list.', starter: 'nums = [1, 2, 3, 4]\n# твій код\n', expected: '[2, 4, 6, 8]', hint: 'print(list(map(lambda x: x*2, nums)))' },
+          { task: 'Використай filter+lambda, щоб залишити з <code>[5, 12, 8, 23, 1, 17]</code> числа >= 10.', starter: 'nums = [5, 12, 8, 23, 1, 17]\n# твій код\n', expected: '[12, 23, 17]', hint: 'print(list(filter(lambda x: x >= 10, nums)))' },
+          { task: 'Відсортуй список рядків <code>["banana", "fig", "apple", "kiwi"]</code> за довжиною.', starter: 'words = ["banana", "fig", "apple", "kiwi"]\n# твій код\n', expected: "['fig', 'kiwi', 'apple', 'banana']", hint: 'print(sorted(words, key=len))' },
+          { task: 'Відсортуй <code>[("a", 30), ("b", 10), ("c", 20)]</code> за другим елементом за спаданням.', starter: 'pairs = [("a", 30), ("b", 10), ("c", 20)]\n# твій код\n', expected: "[('a', 30), ('c', 20), ('b', 10)]", hint: 'print(sorted(pairs, key=lambda x: x[1], reverse=True))' },
+          { task: 'Список словників: <code>[{"n":"A","v":5},{"n":"B","v":12},{"n":"C","v":3}]</code>. Знайди елемент з мінімальним "v" і виведи його "n".', starter: 'data = [{"n":"A","v":5},{"n":"B","v":12},{"n":"C","v":3}]\n# твій код\n', expected: 'C', hint: 'print(min(data, key=lambda x: x["v"])["n"])' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'm5', title: 'МОДУЛЬ 5 · NUMPY',
+    lessons: [
+      {
+        id: 'l5-1', title: '5.1 NumPy масиви',
+        theory: `<p>NumPy — фундаментальна бібліотека для роботи з числовими масивами. Швидша за списки в 10-100 разів.</p>
+<p>Створення: <code>np.array([1,2,3])</code>, <code>np.zeros(5)</code>, <code>np.ones((3,3))</code>, <code>np.arange(10)</code>, <code>np.linspace(0, 1, 5)</code>.</p>
+<p>Векторизовані операції: <code>arr * 2</code>, <code>arr + arr2</code> — працюють поелементно.</p>`,
+        examples: [
+          { code: `import numpy as np\n\narr = np.array([1, 2, 3, 4, 5])\nprint(arr)\nprint(arr.shape)\nprint(arr.dtype)\n\nprint(arr * 2)\nprint(arr ** 2)\nprint(arr + 100)`,
+            output: `[1 2 3 4 5]\n(5,)\nint64\n[ 2  4  6  8 10]\n[ 1  4  9 16 25]\n[101 102 103 104 105]` },
+          { code: `import numpy as np\n\nzeros = np.zeros(5)\nones = np.ones((2, 3))\nrange_arr = np.arange(0, 10, 2)\nlinspace = np.linspace(0, 1, 5)\n\nprint(zeros)\nprint(ones)\nprint(range_arr)\nprint(linspace)`,
+            output: `[0. 0. 0. 0. 0.]\n[[1. 1. 1.]\n [1. 1. 1.]]\n[0 2 4 6 8]\n[0.   0.25 0.5  0.75 1.  ]` },
+          { code: `import numpy as np\n\narr = np.array([10, 25, 8, 47, 13, 35, 19])\nprint("sum:", arr.sum())\nprint("mean:", arr.mean())\nprint("max:", arr.max())\nprint("min:", arr.min())\nprint("std:", round(arr.std(), 2))\nprint("median:", np.median(arr))`,
+            output: `sum: 157\nmean: 22.428571428571427\nmax: 47\nmin: 8\nstd: 12.93\nmedian: 19.0` },
+          { code: `import numpy as np\n\narr = np.array([10, 25, 8, 47, 13, 35, 19])\nmask = arr > 20\nprint(mask)\nprint(arr[mask])\nprint(arr[(arr > 10) & (arr < 30)])`,
+            output: `[False  True False  True False  True False]\n[25 47 35]\n[25 13 19]` }
+        ],
+        exercises: [
+          { task: 'Створи numpy-масив з чисел 1..10 (через arange). Виведи його.', starter: 'import numpy as np\n# твій код\n', expected: '[ 1  2  3  4  5  6  7  8  9 10]', hint: 'print(np.arange(1, 11))' },
+          { task: 'Дано <code>np.array([1, 2, 3, 4, 5])</code>. Помнож на 3 і додай 10. Виведи результат.', starter: 'import numpy as np\narr = np.array([1, 2, 3, 4, 5])\n# твій код\n', expected: '[13 16 19 22 25]', hint: 'print(arr * 3 + 10)' },
+          { task: 'З масиву <code>[15, 8, 23, 4, 17, 30, 11]</code> виведи середнє та максимум через пробіл.', starter: 'import numpy as np\narr = np.array([15, 8, 23, 4, 17, 30, 11])\n# твій код\n', expected: '15.428571428571429 30', hint: 'print(arr.mean(), arr.max())' },
+          { task: 'З <code>[5, 12, 8, 21, 3, 17, 9, 25]</code> виведи тільки елементи > 10.', starter: 'import numpy as np\narr = np.array([5, 12, 8, 21, 3, 17, 9, 25])\n# твій код\n', expected: '[12 21 17 25]', hint: 'print(arr[arr > 10])' },
+          { task: 'Дано <code>np.array([2, 4, 6, 8, 10])</code>. Знайди суму квадратів цих чисел.', starter: 'import numpy as np\narr = np.array([2, 4, 6, 8, 10])\n# твій код\n', expected: '220', hint: 'print((arr ** 2).sum())' },
+          { task: 'Створи масив зі 100 рівномірно розподілених чисел від 0 до 10. Виведи третій елемент (індекс 2).', starter: 'import numpy as np\n# твій код\n', expected: '0.20202020202020202', hint: 'print(np.linspace(0, 10, 100)[2])' },
+          { task: 'З масиву <code>[10, 20, 30, 40, 50]</code> заміни всі значення > 25 на 0. Виведи результат.', starter: 'import numpy as np\narr = np.array([10, 20, 30, 40, 50])\n# твій код\n', expected: '[10 20  0  0  0]', hint: 'arr[arr > 25] = 0\nprint(arr)' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'm6', title: 'МОДУЛЬ 6 · PANDAS',
+    lessons: [
+      {
+        id: 'l6-1', title: '6.1 Series та DataFrame',
+        theory: `<p><strong>Series</strong> — одновимірна іменована послідовність (як стовпець таблиці). <strong>DataFrame</strong> — двовимірна таблиця зі стовпцями різних типів.</p>
+<p>Створення DataFrame: <code>pd.DataFrame({"col1": [...], "col2": [...]})</code>.</p>
+<p>Огляд даних: <code>.head()</code>, <code>.tail()</code>, <code>.info()</code>, <code>.describe()</code>, <code>.shape</code>, <code>.columns</code>, <code>.dtypes</code>.</p>`,
+        examples: [
+          { code: `import pandas as pd\n\ns = pd.Series([10, 20, 30, 40], index=["a", "b", "c", "d"])\nprint(s)\nprint("sum:", s.sum())\nprint("a value:", s["a"])`,
+            output: `a    10\nb    20\nc    30\nd    40\ndtype: int64\nsum: 100\na value: 10` },
+          { code: `import pandas as pd\n\ndf = pd.DataFrame({\n    "name": ["Ivan", "Olena", "Petro", "Anna"],\n    "city": ["Kyiv", "Lviv", "Odesa", "Lviv"],\n    "salary": [50000, 65000, 48000, 72000]\n})\nprint(df)\nprint()\nprint("Shape:", df.shape)\nprint("Columns:", list(df.columns))`,
+            output: `    name   city  salary\n0   Ivan   Kyiv   50000\n1  Olena   Lviv   65000\n2  Petro  Odesa   48000\n3   Anna   Lviv   72000\n\nShape: (4, 3)\nColumns: ['name', 'city', 'salary']` },
+          { code: `import pandas as pd\n\ndf = pd.DataFrame({\n    "product": ["A", "B", "C"],\n    "price": [100, 200, 300]\n})\n\ndf["tax"] = df["price"] * 0.2\ndf["total"] = df["price"] + df["tax"]\nprint(df)`,
+            output: `  product  price   tax  total\n0       A    100  20.0  120.0\n1       B    200  40.0  240.0\n2       C    300  60.0  360.0` }
+        ],
+        exercises: [
+          { task: 'Створи Series з <code>[5, 10, 15, 20]</code> та індексом <code>["q1","q2","q3","q4"]</code>. Виведи суму.', starter: 'import pandas as pd\n# твій код\n', expected: '50', hint: 's = pd.Series([5,10,15,20], index=["q1","q2","q3","q4"])\nprint(s.sum())' },
+          { task: 'Створи DataFrame з двома колонками: <code>name=["A","B","C"]</code>, <code>score=[80, 90, 75]</code>. Виведи середнє значення колонки score.', starter: 'import pandas as pd\n# твій код\n', expected: '81.66666666666667', hint: 'df = pd.DataFrame({"name":["A","B","C"], "score":[80,90,75]})\nprint(df["score"].mean())' },
+          { task: 'Дано DataFrame нижче. Виведи кількість рядків.', starter: 'import pandas as pd\ndf = pd.DataFrame({"a": [1,2,3,4,5], "b": [10,20,30,40,50]})\n# твій код\n', expected: '5', hint: 'print(len(df))' },
+          { task: 'Додай у DataFrame <code>df</code> нову колонку "c" = a + b. Виведи df.', starter: 'import pandas as pd\ndf = pd.DataFrame({"a": [1,2,3], "b": [10,20,30]})\n# твій код\n', expected: '   a   b   c\n0  1  10  11\n1  2  20  22\n2  3  30  33', hint: 'df["c"] = df["a"] + df["b"]\nprint(df)' },
+          { task: 'З df виведи список назв колонок як Python list.', starter: 'import pandas as pd\ndf = pd.DataFrame({"product": [1], "price": [100], "qty": [5]})\n# твій код\n', expected: "['product', 'price', 'qty']", hint: 'print(list(df.columns))' },
+          { task: 'Виведи максимальне значення колонки "salary" у df нижче.', starter: 'import pandas as pd\ndf = pd.DataFrame({"name":["A","B","C","D"], "salary":[50000, 80000, 65000, 72000]})\n# твій код\n', expected: '80000', hint: 'print(df["salary"].max())' }
+        ]
+      },
+      {
+        id: 'l6-2', title: '6.2 Pandas: фільтрація і вибірка',
+        theory: `<p>Вибір колонки: <code>df["col"]</code> (Series) або <code>df[["col1","col2"]]</code> (DataFrame).</p>
+<p>Фільтрація: <code>df[df["col"] &gt; 100]</code>. Кілька умов: <code>df[(df["a"] &gt; 10) &amp; (df["b"] &lt; 20)]</code> — обов'язково <code>&amp;</code> та <code>|</code>!</p>
+<p>Корисні: <code>.isin([...])</code>, <code>.between(a,b)</code>, <code>.str.contains(...)</code>, <code>.isna()</code>.</p>`,
+        examples: [
+          { code: `import pandas as pd\n\ndf = pd.DataFrame({\n    "name": ["Ivan", "Olena", "Petro", "Anna", "Maria"],\n    "city": ["Kyiv", "Lviv", "Odesa", "Lviv", "Kyiv"],\n    "salary": [50000, 65000, 48000, 72000, 58000]\n})\n\nhigh = df[df["salary"] > 55000]\nprint(high)`,
+            output: `    name  city  salary\n1  Olena  Lviv   65000\n3   Anna  Lviv   72000\n4  Maria  Kyiv   58000` },
+          { code: `import pandas as pd\n\ndf = pd.DataFrame({\n    "name": ["Ivan", "Olena", "Petro", "Anna"],\n    "city": ["Kyiv", "Lviv", "Odesa", "Lviv"],\n    "salary": [50000, 65000, 48000, 72000]\n})\n\nresult = df[(df["city"] == "Lviv") & (df["salary"] > 60000)]\nprint(result)`,
+            output: `    name  city  salary\n1  Olena  Lviv   65000\n3   Anna  Lviv   72000` },
+          { code: `import pandas as pd\n\ndf = pd.DataFrame({\n    "product": ["Apple iPhone", "Samsung TV", "Apple Watch", "Sony Headphones"],\n    "price": [40000, 25000, 15000, 8000]\n})\n\napple_products = df[df["product"].str.contains("Apple")]\nprint(apple_products)`,
+            output: `        product  price\n0  Apple iPhone  40000\n2   Apple Watch  15000` }
+        ],
+        exercises: [
+          { task: 'Виведи рядки, де salary > 50000.', starter: 'import pandas as pd\ndf = pd.DataFrame({"name":["A","B","C","D"], "salary":[45000, 60000, 50000, 72000]})\n# твій код\n', expected: '  name  salary\n1    B   60000\n3    D   72000', hint: 'print(df[df["salary"] > 50000])' },
+          { task: 'З df виведи тільки колонки "name" і "salary" як новий DataFrame.', starter: 'import pandas as pd\ndf = pd.DataFrame({"name":["A","B"], "city":["X","Y"], "salary":[100, 200]})\n# твій код\n', expected: '  name  salary\n0    A     100\n1    B     200', hint: 'print(df[["name", "salary"]])' },
+          { task: 'Виведи рядки, де city у списку ["Kyiv","Lviv"].', starter: 'import pandas as pd\ndf = pd.DataFrame({"name":["A","B","C","D"], "city":["Kyiv","Odesa","Lviv","Dnipro"]})\n# твій код\n', expected: '  name  city\n0    A  Kyiv\n2    C  Lviv', hint: 'print(df[df["city"].isin(["Kyiv","Lviv"])])' },
+          { task: 'Виведи рядки, де price між 100 і 300 включно.', starter: 'import pandas as pd\ndf = pd.DataFrame({"product":["A","B","C","D","E"], "price":[50, 150, 250, 350, 200]})\n# твій код\n', expected: '  product  price\n1       B    150\n2       C    250\n4       E    200', hint: 'print(df[df["price"].between(100, 300)])' },
+          { task: 'Виведи рядки, де name починається з літери "A". (Підказка: <code>.str.startswith("A")</code>)', starter: 'import pandas as pd\ndf = pd.DataFrame({"name":["Anna","Boris","Alex","Maria","Andriy"]})\n# твій код\n', expected: '     name\n0    Anna\n2    Alex\n4  Andriy', hint: 'print(df[df["name"].str.startswith("A")])' },
+          { task: 'Скільки рядків мають salary >= 50000? Виведи число.', starter: 'import pandas as pd\ndf = pd.DataFrame({"name":["A","B","C","D","E"], "salary":[45000, 60000, 50000, 72000, 40000]})\n# твій код\n', expected: '3', hint: 'print(len(df[df["salary"] >= 50000]))' }
+        ]
+      },
+      {
+        id: 'l6-3', title: '6.3 GroupBy та агрегації',
+        theory: `<p><code>df.groupby("col")</code> — групує дані за значеннями колонки. Потім застосовуй агрегації.</p>
+<p>Прості агрегації: <code>.sum()</code>, <code>.mean()</code>, <code>.count()</code>, <code>.max()</code>, <code>.min()</code>, <code>.std()</code>.</p>
+<p>Кілька агрегацій одночасно: <code>.agg(["sum", "mean", "count"])</code>.</p>`,
+        examples: [
+          { code: `import pandas as pd\n\ndf = pd.DataFrame({\n    "city": ["Kyiv","Lviv","Kyiv","Odesa","Lviv","Kyiv"],\n    "salary": [50000, 65000, 70000, 48000, 72000, 58000]\n})\n\nprint(df.groupby("city")["salary"].mean())`,
+            output: `city\nKyiv     59333.333333\nLviv     68500.000000\nOdesa    48000.000000\nName: salary, dtype: float64` },
+          { code: `import pandas as pd\n\ndf = pd.DataFrame({\n    "product": ["A","B","A","B","A","C"],\n    "region": ["N","N","S","S","N","S"],\n    "sales": [100, 200, 150, 250, 120, 80]\n})\n\nresult = df.groupby("product")["sales"].agg(["sum","mean","count"])\nprint(result)`,
+            output: `         sum        mean  count\nproduct                        \nA        370  123.333333      3\nB        450  225.000000      2\nC         80   80.000000      1` },
+          { code: `import pandas as pd\n\ndf = pd.DataFrame({\n    "year": [2024,2024,2025,2025,2026,2026],\n    "region": ["N","S","N","S","N","S"],\n    "sales": [100, 150, 120, 180, 140, 200]\n})\n\nresult = df.groupby(["year","region"])["sales"].sum()\nprint(result)`,
+            output: `year  region\n2024  N         100\n      S         150\n2025  N         120\n      S         180\n2026  N         140\n      S         200\nName: sales, dtype: int64` }
+        ],
+        exercises: [
+          { task: 'Згрупуй df за "category" і виведи суму "amount" по кожній.', starter: 'import pandas as pd\ndf = pd.DataFrame({"category":["A","B","A","B","A"], "amount":[10, 20, 15, 25, 30]})\n# твій код\n', expected: 'category\nA    55\nB    45\nName: amount, dtype: int64', hint: 'print(df.groupby("category")["amount"].sum())' },
+          { task: 'Знайди середнє "salary" по "dept".', starter: 'import pandas as pd\ndf = pd.DataFrame({"dept":["IT","HR","IT","HR","IT"], "salary":[80000, 50000, 90000, 55000, 85000]})\n# твій код\n', expected: 'dept\nHR    52500.0\nIT    85000.0\nName: salary, dtype: float64', hint: 'print(df.groupby("dept")["salary"].mean())' },
+          { task: 'Підрахуй кількість рядків у кожній "category" (через groupby + size).', starter: 'import pandas as pd\ndf = pd.DataFrame({"category":["A","B","A","B","C","A","B","C"]})\n# твій код\n', expected: 'category\nA    3\nB    3\nC    2\ndtype: int64', hint: 'print(df.groupby("category").size())' },
+          { task: 'Знайди максимальну "sales" по кожному "region".', starter: 'import pandas as pd\ndf = pd.DataFrame({"region":["N","S","N","S","N"], "sales":[100, 200, 150, 250, 120]})\n# твій код\n', expected: 'region\nN    150\nS    250\nName: sales, dtype: int64', hint: 'print(df.groupby("region")["sales"].max())' },
+          { task: 'Згрупуй df за "type" і знайди ОДНОЧАСНО суму і середнє "value".', starter: 'import pandas as pd\ndf = pd.DataFrame({"type":["X","Y","X","Y","X"], "value":[10, 20, 30, 40, 50]})\n# твій код\n', expected: '      sum  mean\ntype           \nX      90  30.0\nY      60  30.0', hint: 'print(df.groupby("type")["value"].agg(["sum","mean"]))' }
+        ]
+      },
+      {
+        id: 'l6-4', title: '6.4 Сортування, merge, очищення',
+        theory: `<p>Сортування: <code>df.sort_values("col")</code>, з кількома: <code>df.sort_values(["a","b"], ascending=[True, False])</code>.</p>
+<p>Об'єднання: <code>pd.merge(df1, df2, on="key")</code>. Опції: <code>how="left"</code>, <code>"right"</code>, <code>"outer"</code>.</p>
+<p>Пропущені значення: <code>.isna()</code>, <code>.dropna()</code>, <code>.fillna(value)</code>. Унікальні: <code>.unique()</code>, <code>.nunique()</code>, <code>.drop_duplicates()</code>.</p>`,
+        examples: [
+          { code: `import pandas as pd\n\ndf = pd.DataFrame({\n    "name": ["Ivan","Olena","Petro","Anna"],\n    "salary": [50000, 65000, 48000, 72000]\n})\n\nprint(df.sort_values("salary", ascending=False))`,
+            output: `    name  salary\n3   Anna   72000\n1  Olena   65000\n0   Ivan   50000\n2  Petro   48000` },
+          { code: `import pandas as pd\n\nemployees = pd.DataFrame({\n    "id": [1, 2, 3, 4],\n    "name": ["Ivan","Olena","Petro","Anna"],\n    "dept_id": [10, 20, 10, 30]\n})\ndepts = pd.DataFrame({\n    "dept_id": [10, 20, 30],\n    "dept_name": ["IT", "HR", "Sales"]\n})\n\nresult = pd.merge(employees, depts, on="dept_id")\nprint(result)`,
+            output: `   id   name  dept_id dept_name\n0   1   Ivan       10        IT\n1   3  Petro       10        IT\n2   2  Olena       20        HR\n3   4   Anna       30     Sales` },
+          { code: `import pandas as pd\nimport numpy as np\n\ndf = pd.DataFrame({\n    "name": ["A","B","C","D"],\n    "price": [100, np.nan, 200, np.nan],\n    "qty": [10, 5, np.nan, 8]\n})\n\nprint(df.fillna(0))`,
+            output: `  name  price   qty\n0    A  100.0  10.0\n1    B    0.0   5.0\n2    C  200.0   0.0\n3    D    0.0   8.0` }
+        ],
+        exercises: [
+          { task: 'Відсортуй df за "price" за спаданням.', starter: 'import pandas as pd\ndf = pd.DataFrame({"product":["A","B","C","D"], "price":[120, 80, 250, 150]})\n# твій код\n', expected: '  product  price\n2       C    250\n3       D    150\n0       A    120\n1       B     80', hint: 'print(df.sort_values("price", ascending=False))' },
+          { task: 'Об\'єднай df1 і df2 за колонкою "id".', starter: 'import pandas as pd\ndf1 = pd.DataFrame({"id":[1,2,3], "name":["A","B","C"]})\ndf2 = pd.DataFrame({"id":[1,2,3], "score":[90, 85, 78]})\n# твій код\n', expected: '   id name  score\n0   1    A     90\n1   2    B     85\n2   3    C     78', hint: 'print(pd.merge(df1, df2, on="id"))' },
+          { task: 'У df заповни всі NaN нулями і виведи DataFrame.', starter: 'import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({"a":[1, np.nan, 3], "b":[np.nan, 5, 6]})\n# твій код\n', expected: '     a    b\n0  1.0  0.0\n1  0.0  5.0\n2  3.0  6.0', hint: 'print(df.fillna(0))' },
+          { task: 'Знайди кількість унікальних значень у колонці "city".', starter: 'import pandas as pd\ndf = pd.DataFrame({"city":["Kyiv","Lviv","Kyiv","Odesa","Lviv","Kyiv"]})\n# твій код\n', expected: '3', hint: 'print(df["city"].nunique())' },
+          { task: 'Видали дублікати з df за колонкою "email" (залишити перший).', starter: 'import pandas as pd\ndf = pd.DataFrame({"email":["a@x","b@x","a@x","c@x"], "n":[1,2,3,4]})\n# твій код\n', expected: '  email  n\n0   a@x  1\n1   b@x  2\n3   c@x  4', hint: 'print(df.drop_duplicates("email"))' },
+          { task: 'Знайди суму без NaN у колонці "value".', starter: 'import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({"value":[10, np.nan, 20, 30, np.nan, 5]})\n# твій код\n', expected: '65.0', hint: 'print(df["value"].sum())' }
+        ]
+      }
+    ]
+  }
+];
+
+// ============================================================
+// СТАН
+// ============================================================
+let currentLessonId = null;
+let progress = {};
+let userCode = {};
+const STORAGE = { progress: 'pyt:progress', code: 'pyt:code', lesson: 'pyt:lesson' };
+
+// ============================================================
+// СХОВИЩЕ
+// ============================================================
+async function loadState() {
+  try { const p = await window.storage.get(STORAGE.progress); if (p) progress = JSON.parse(p.value); } catch (e) {}
+  try { const c = await window.storage.get(STORAGE.code); if (c) userCode = JSON.parse(c.value); } catch (e) {}
+  try { const l = await window.storage.get(STORAGE.lesson); if (l) currentLessonId = l.value; } catch (e) {}
+}
+async function saveProgress() { try { await window.storage.set(STORAGE.progress, JSON.stringify(progress)); } catch (e) {} }
+async function saveCode() { try { await window.storage.set(STORAGE.code, JSON.stringify(userCode)); } catch (e) {} }
+async function saveLesson() { try { await window.storage.set(STORAGE.lesson, currentLessonId); } catch (e) {} }
+
+// ============================================================
+// ВИКОНАННЯ PYTHON ЧЕРЕЗ CLAUDE API
+// ============================================================
+async function executePython(code) {
+  const prompt = `You are a Python 3 interpreter. Execute this code and return EXACTLY what stdout would show — what print() statements produce.
+
+CRITICAL RULES:
+- Return ONLY the raw stdout text. No markdown code fences. No explanations. No commentary.
+- Preserve exact formatting, whitespace, newlines, trailing spaces.
+- For errors, return the standard Python traceback format starting with "Traceback (most recent call last):"
+- Available libraries: full standard library, numpy (as np), pandas (as pd), math, statistics, json, datetime, re, collections.
+- For pandas DataFrames printed with print(), reproduce the exact default repr formatting (column alignment, dtypes shown for Series).
+- If code produces no output, return empty string.
+- Numpy dtypes shown as just "int64" or "float64" (not with extra info on Windows).
+
+CODE TO EXECUTE:
+\`\`\`python
+${code}
+\`\`\`
+
+Output only the stdout (no fences, no extra text):`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`API ${response.status}: ${errText.slice(0, 200)}`);
+    }
+    const data = await response.json();
+    let text = data.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('');
+    // Прибрати markdown-обгортки, якщо потрапили
+    text = text.replace(/^```[a-z]*\n?/i, '').replace(/\n?```\s*$/i, '');
+    return { ok: true, output: text };
+  } catch (e) {
+    return { ok: false, error: String(e.message || e) };
+  }
+}
+
+// ============================================================
+// УТИЛІТИ
+// ============================================================
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function getAllLessons() { return curriculum.flatMap(m => m.lessons); }
+function getLessonProgress(lessonId) {
+  const lesson = getAllLessons().find(l => l.id === lessonId);
+  if (!lesson) return { done: 0, total: 0 };
+  const p = progress[lessonId] || {};
+  return { done: Object.values(p).filter(v => v === true).length, total: lesson.exercises.length };
+}
+function getTotalProgress() {
+  let total = 0, done = 0;
+  for (const lesson of getAllLessons()) {
+    const lp = getLessonProgress(lesson.id);
+    total += lp.total; done += lp.done;
+  }
+  return { done, total };
+}
+function updateProgressBar() {
+  const { done, total } = getTotalProgress();
+  const pct = total ? (done / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} / ${total} вправ виконано`;
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function renderSidebar() {
+  const nav = document.getElementById('nav');
+  nav.innerHTML = '';
+  for (const module of curriculum) {
+    const mDiv = document.createElement('div');
+    mDiv.innerHTML = `<div class="module-title">${escapeHtml(module.title)}</div>`;
+    for (const lesson of module.lessons) {
+      const lp = getLessonProgress(lesson.id);
+      let cls = '', ch = '';
+      if (lp.done === lp.total && lp.total > 0) { cls = 'done'; ch = '✓'; }
+      else if (lp.done > 0) { cls = 'partial'; ch = lp.done; }
+      const item = document.createElement('div');
+      item.className = 'lesson-item' + (lesson.id === currentLessonId ? ' active' : '');
+      item.innerHTML = `<span class="lesson-check ${cls}">${ch}</span><span>${escapeHtml(lesson.title)}</span>`;
+      item.addEventListener('click', () => loadLesson(lesson.id));
+      mDiv.appendChild(item);
+    }
+    nav.appendChild(mDiv);
+  }
+  updateProgressBar();
+}
+
+// ============================================================
+// УРОК
+// ============================================================
+function loadLesson(lessonId) {
+  currentLessonId = lessonId;
+  saveLesson();
+  const lesson = getAllLessons().find(l => l.id === lessonId);
+  if (!lesson) return;
+  
+  const main = document.getElementById('main');
+  let html = `<h2>${escapeHtml(lesson.title)}</h2>`;
+  html += `<div class="theory">${lesson.theory}</div>`;
+  
+  html += `<h3>📖 Приклади</h3>`;
+  lesson.examples.forEach((ex, i) => {
+    html += `<div class="example">
+      <div class="example-header">Приклад ${i + 1}</div>
+      <div class="example-body">
+        <pre class="language-python"><code class="language-python">${escapeHtml(ex.code)}</code></pre>
+        <div class="output-label">Вивід</div>
+        <div class="output-block">${escapeHtml(ex.output)}</div>
+      </div>
+    </div>`;
+  });
+  
+  html += `<h3>✏️ Вправи</h3>`;
+  lesson.exercises.forEach((ex, i) => {
+    const isDone = (progress[lessonId] || {})[i] === true;
+    const savedCode = (userCode[lessonId] || {})[i];
+    const initCode = savedCode !== undefined ? savedCode : ex.starter;
+    html += `<div class="exercise${isDone ? ' done' : ''}" data-ex-idx="${i}">
+      <div class="exercise-header">
+        <div class="exercise-title">Вправа ${i + 1}</div>
+        <div class="exercise-status${isDone ? ' done' : ''}">${isDone ? '✓ Виконано' : 'Не виконано'}</div>
+      </div>
+      <div class="exercise-body">
+        <div class="task-text">${ex.task}</div>
+        <div class="editor-wrap">
+          <textarea class="editor" spellcheck="false" data-ex="${i}">${escapeHtml(initCode)}</textarea>
+        </div>
+        <div class="exercise-actions">
+          <button class="btn" data-action="run" data-ex="${i}">▶ Виконати</button>
+          <button class="btn success" data-action="check" data-ex="${i}">✓ Перевірити</button>
+          <button class="btn warn" data-action="expected" data-ex="${i}">📤 Вивід</button>
+          <button class="btn secondary" data-action="hint" data-ex="${i}">💡 Розв'язок</button>
+          <button class="btn ghost" data-action="reset" data-ex="${i}">↺ Скинути</button>
+        </div>
+        <div class="hint" id="hint-${i}"><div class="hint-label">Розв'язок:</div><pre style="margin:0;font-family:inherit;white-space:pre-wrap;">${escapeHtml(ex.hint)}</pre></div>
+        <div class="result" id="result-${i}" style="display:none"></div>
+      </div>
+    </div>`;
+  });
+  
+  const allLessons = getAllLessons();
+  const idx = allLessons.findIndex(l => l.id === lessonId);
+  const prev = idx > 0 ? allLessons[idx - 1] : null;
+  const next = idx < allLessons.length - 1 ? allLessons[idx + 1] : null;
+  html += `<div class="lesson-nav">
+    ${prev ? `<button class="btn secondary" data-nav="${prev.id}">← ${escapeHtml(prev.title)}</button>` : '<span></span>'}
+    ${next ? `<button class="btn secondary" data-nav="${next.id}">${escapeHtml(next.title)} →</button>` : '<span></span>'}
+  </div>`;
+  
+  main.innerHTML = html;
+  if (window.Prism) window.Prism.highlightAll();
+  
+  main.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+      const exIdx = parseInt(btn.dataset.ex);
+      if (action === 'run') runCode(exIdx);
+      else if (action === 'check') checkCode(exIdx);
+      else if (action === 'expected') showExpected(exIdx);
+      else if (action === 'hint') toggleHint(exIdx);
+      else if (action === 'reset') resetCode(exIdx);
+    });
+  });
+  
+  main.querySelectorAll('[data-nav]').forEach(btn => {
+    btn.addEventListener('click', () => loadLesson(btn.dataset.nav));
+  });
+  
+  main.querySelectorAll('.editor').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const exIdx = parseInt(ta.dataset.ex);
+      if (!userCode[lessonId]) userCode[lessonId] = {};
+      userCode[lessonId][exIdx] = ta.value;
+      saveCode();
+    });
+    ta.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = ta.selectionStart, end = ta.selectionEnd;
+        ta.value = ta.value.substring(0, start) + '    ' + ta.value.substring(end);
+        ta.selectionStart = ta.selectionEnd = start + 4;
+      }
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        const exIdx = parseInt(ta.dataset.ex);
+        runCode(exIdx);
+      }
+    });
+    // авто-висота
+    ta.style.height = 'auto';
+    ta.style.height = Math.max(80, ta.scrollHeight + 4) + 'px';
+  });
+  
+  renderSidebar();
+  document.getElementById('main').scrollTop = 0;
+}
+
+// ============================================================
+// ДІЇ
+// ============================================================
+function setButtonsDisabled(exIdx, disabled) {
+  document.querySelectorAll(`[data-ex="${exIdx}"][data-action="run"], [data-ex="${exIdx}"][data-action="check"]`)
+    .forEach(b => b.disabled = disabled);
+}
+
+async function runCode(exIdx) {
+  const ta = document.querySelector(`textarea[data-ex="${exIdx}"]`);
+  const resultDiv = document.getElementById(`result-${exIdx}`);
+  const code = ta.value;
+  
+  resultDiv.style.display = 'block';
+  resultDiv.className = 'result info';
+  resultDiv.innerHTML = '<span class="spinner-inline" style="border-color:rgba(59,130,246,0.3);border-top-color:#1e40af"></span>Claude виконує код...';
+  setButtonsDisabled(exIdx, true);
+  
+  const { ok, output, error } = await executePython(code);
+  setButtonsDisabled(exIdx, false);
+  
+  if (!ok) {
+    resultDiv.className = 'result error';
+    resultDiv.innerHTML = `<div class="result-header">⚠️ Помилка API</div>${escapeHtml(error)}`;
+    return;
+  }
+  
+  const isError = output.startsWith('Traceback') || output.startsWith('  File ') || /^[A-Z][a-z]+Error:/.test(output);
+  resultDiv.className = isError ? 'result error' : 'result info';
+  resultDiv.innerHTML = `<div class="result-header">${isError ? '❌ Помилка виконання' : '📤 Вивід'}</div>${escapeHtml(output || '(без виводу)')}`;
+}
+
+async function checkCode(exIdx) {
+  const lesson = getAllLessons().find(l => l.id === currentLessonId);
+  const exercise = lesson.exercises[exIdx];
+  const ta = document.querySelector(`textarea[data-ex="${exIdx}"]`);
+  const resultDiv = document.getElementById(`result-${exIdx}`);
+  const code = ta.value;
+  
+  resultDiv.style.display = 'block';
+  resultDiv.className = 'result info';
+  resultDiv.innerHTML = '<span class="spinner-inline" style="border-color:rgba(59,130,246,0.3);border-top-color:#1e40af"></span>Виконую та перевіряю...';
+  setButtonsDisabled(exIdx, true);
+  
+  const { ok, output, error } = await executePython(code);
+  setButtonsDisabled(exIdx, false);
+  
+  if (!ok) {
+    resultDiv.className = 'result error';
+    resultDiv.innerHTML = `<div class="result-header">⚠️ Помилка API</div>${escapeHtml(error)}`;
+    return;
+  }
+  
+  const actual = output.replace(/\s+$/, '');
+  const expected = exercise.expected.replace(/\s+$/, '');
+  
+  if (actual === expected) {
+    resultDiv.className = 'result success';
+    resultDiv.innerHTML = `<div class="result-header">✅ Правильно!</div>${escapeHtml(actual)}`;
+    if (!progress[currentLessonId]) progress[currentLessonId] = {};
+    progress[currentLessonId][exIdx] = true;
+    await saveProgress();
+    const exDiv = document.querySelector(`.exercise[data-ex-idx="${exIdx}"]`);
+    if (exDiv) {
+      exDiv.classList.add('done');
+      const status = exDiv.querySelector('.exercise-status');
+      status.textContent = '✓ Виконано';
+      status.classList.add('done');
+    }
+    renderSidebar();
+  } else {
+    resultDiv.className = 'result error';
+    resultDiv.innerHTML = `<div class="result-header">❌ Не співпадає з очікуваним</div>` +
+      `<strong>Очікувано:</strong>\n${escapeHtml(expected)}\n\n` +
+      `<strong>Отримано:</strong>\n${escapeHtml(actual || '(пусто)')}`;
+  }
+}
+
+function showExpected(exIdx) {
+  const lesson = getAllLessons().find(l => l.id === currentLessonId);
+  const exercise = lesson.exercises[exIdx];
+  const resultDiv = document.getElementById(`result-${exIdx}`);
+  resultDiv.style.display = 'block';
+  resultDiv.className = 'result info';
+  resultDiv.innerHTML = `<div class="result-header">📤 Очікуваний вивід</div>${escapeHtml(exercise.expected)}`;
+}
+
+function toggleHint(exIdx) {
+  document.getElementById(`hint-${exIdx}`).classList.toggle('visible');
+}
+
+function resetCode(exIdx) {
+  const lesson = getAllLessons().find(l => l.id === currentLessonId);
+  const exercise = lesson.exercises[exIdx];
+  const ta = document.querySelector(`textarea[data-ex="${exIdx}"]`);
+  ta.value = exercise.starter;
+  if (userCode[currentLessonId]) delete userCode[currentLessonId][exIdx];
+  saveCode();
+}
+
+// ============================================================
+// СТАРТ
+// ============================================================
+async function init() {
+  await loadState();
+  renderSidebar();
+  if (currentLessonId) loadLesson(currentLessonId);
+  
+  document.getElementById('resetBtn').addEventListener('click', async () => {
+    if (confirm('Скинути весь прогрес і збережений код?')) {
+      progress = {}; userCode = {};
+      await saveProgress(); await saveCode();
+      renderSidebar();
+      if (currentLessonId) loadLesson(currentLessonId);
+    }
+  });
+}
+
+init();
+</script>
+</body>
+</html>
