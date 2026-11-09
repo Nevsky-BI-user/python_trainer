@@ -7,7 +7,8 @@ export default defineConfig({
   base: './',
   worker: { format: 'es' },
   server: { watch: { ignored: IGNORED } },
-  build: { target: 'es2022', chunkSizeWarningLimit: 900 },
+  // Половина основного чанка: текст курсу (src/content, ~540 кБ), каталог читає його весь на старті.
+  build: { target: 'es2022', chunkSizeWarningLimit: 1100 },
   test: {
     include: ['tests/**/*.test.js'],
     exclude: ['node_modules/**', ...IGNORED],
