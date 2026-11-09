@@ -248,7 +248,7 @@ print(wide[wide["gap"] < 0].sort_values("gap"))`,
 shop
 Airport   255   300  -45
 Mall      410   450  -40`,
-          hint: 'pivot(index="shop", columns="kind", values="amount"); недобір: gap &lt; 0, найбільший недобір це найменше значення gap.',
+          hint: 'pivot(index="shop", columns="kind", values="amount"); недобір: gap < 0, найбільший недобір це найменше значення gap.',
         },
       ],
     },
@@ -666,7 +666,7 @@ print(df.loc[df["cum"] >= plan, "month"].iloc[0])`,
 df = need("df", pd.DataFrame)
 expect("cum" in df.columns, "Додай у df колонку cum")
 expect(list(df["cum"]) == [310, 650, 1045, 1465, 1845, 2295, 2805, 3275], "cum має бути наростальним підсумком sales")`,
-          hint: 'cumsum(), потім фільтр cum &gt;= plan і перший рядок через .iloc[0].',
+          hint: 'cumsum(), потім фільтр cum >= plan і перший рядок через .iloc[0].',
         },
         {
           task: 'Добові замовлення скачуть. Додай колонку <code>avg3</code>: ковзне середнє за 3 дні, округлене до 1 знака. Виведи <code>df</code>.',
@@ -740,7 +740,7 @@ print(df[df["change"] < 0])`,
           expected: `     shop    month  sales  change
 1  Center  2024-02    470   -30.0
 5    Mall  2024-03    310   -30.0`,
-          hint: 'df.groupby("shop")["sales"].diff(), потім фільтр change &lt; 0.',
+          hint: 'df.groupby("shop")["sales"].diff(), потім фільтр change < 0.',
         },
       ],
     },
@@ -964,7 +964,7 @@ print(df)`,
 1     Mall   450   410   miss
 2  Airport   300   300   done
 3  Station   280   255   miss`,
-          hint: 'np.where(df["fact"] &gt;= df["plan"], "done", "miss").',
+          hint: 'np.where(df["fact"] >= df["plan"], "done", "miss").',
         },
         {
           task: 'Сегментуй клієнтів: <code>vip</code>, якщо витратили від 10000 грн і зробили від 5 замовлень; <code>big</code>, якщо витратили від 10000 грн; <code>frequent</code>, якщо зробили від 5 замовлень; решта <code>regular</code>. Збережи в колонку <code>segment</code> і виведи кількість клієнтів у кожному сегменті, відсортовану за назвою сегмента.',
@@ -998,7 +998,7 @@ Name: count, dtype: int64`,
 df = need("df", pd.DataFrame)
 expect("segment" in df.columns, "Додай у df колонку segment")
 expect(list(df["segment"]) == ["vip", "frequent", "big", "frequent", "regular", "vip", "regular", "frequent"], "Перевір порядок умов: vip має йти першим, інакше його перехопить big або frequent")`,
-          hint: 'np.select([big &amp; frequent, big, frequent], [...], default="regular"): найвужча умова перша.',
+          hint: 'np.select([big & frequent, big, frequent], [...], default="regular"): найвужча умова перша.',
         },
       ],
     },
