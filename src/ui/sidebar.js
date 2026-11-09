@@ -1,5 +1,5 @@
 // Бічна навігація: пошук, уроки за модулями, задачі за рівнями, прогрес і файл прогресу.
-import { h, progressRing } from './dom.js';
+import { fill, h, progressRing } from './dom.js';
 import { icon } from './icons.js';
 import { button, progressBar } from './parts.js';
 import { lessonHref, taskHref } from './router.js';
@@ -9,6 +9,7 @@ export function createSidebar(root, ctx) {
   const open = new Set();
   let query = '';
   let active = { kind: 'home', id: null };
+  let countCh = 3;
 
   const input = h('input', {
     class: 'side-search-input',
@@ -56,6 +57,7 @@ export function createSidebar(root, ctx) {
       entries.flatMap((e) => e.itemIds),
       store.isDone,
     );
+    countCh = Math.max(countCh, 2 * String(c.total).length + 1);
     const details = h(
       'details',
       { class: 'side-group', open: Boolean(query) || open.has(key) },
@@ -87,6 +89,7 @@ export function createSidebar(root, ctx) {
 
   function render() {
     const scroll = nav.scrollTop;
+    countCh = 3;
     const lessonGroups = catalog.modules.map((mod, mi) =>
       group(
         `m:${mod.id}`,
@@ -119,7 +122,10 @@ export function createSidebar(root, ctx) {
     );
     const anyLessons = lessonGroups.some(Boolean);
     const anyTasks = taskGroups.some(Boolean);
-    nav.replaceChildren(
+    // Лічильники груп однієї ширини, щоб колонка назв закінчувалась на тому самому x.
+    nav.style.setProperty('--count-ch', countCh);
+    fill(
+      nav,
       query ? null : h('div', { class: 'side-top' }, topLink('#/', 'grid', 'Огляд', active.kind === 'home'), topLink('#/sandbox', 'terminal', 'Пісочниця', active.kind === 'sandbox')),
       anyLessons ? h('div', { class: 'side-heading' }, 'Уроки') : null,
       lessonGroups,

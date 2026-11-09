@@ -1,5 +1,5 @@
 // Огляд: продовжити з першого невиконаного, прогрес, модулі уроків, сходинки практикуму.
-import { h, pluralUk, progressRing } from '../dom.js';
+import { fill, fitColumn, h, pluralUk, progressRing } from '../dom.js';
 import { icon } from '../icons.js';
 import { meter, progressBar } from '../parts.js';
 import { lessonHref, nextHref, parseHash, taskHref } from '../router.js';
@@ -7,8 +7,10 @@ import { lessonHref, nextHref, parseHash, taskHref } from '../router.js';
 export function homeView(ctx) {
   const { store } = ctx;
   const el = h('div', { class: 'page home' });
-  const render = () => el.replaceChildren(hero(ctx), stats(ctx), modulesSection(ctx), levelsSection(ctx));
+  const render = () => fill(el, hero(ctx), stats(ctx), modulesSection(ctx), levelsSection(ctx));
   render();
+  // Назви задач усіх рівнів в одній колонці: лічильники стоять одразу за найдовшою назвою.
+  fitColumn(el, '.level-task-title', '--task-title-w');
   const unsubscribe = store.subscribe(render);
   return { el, title: 'Огляд', destroy: unsubscribe };
 }
@@ -84,7 +86,18 @@ function modulesSection(ctx) {
       );
     })
     .filter(Boolean);
-  return h('section', { class: 'home-section' }, h('h2', { class: 'section-title' }, 'Уроки'), h('div', { class: 'module-grid' }, cards));
+  const countCh = Math.max(3, ...catalog.modules.map((mod) => fractionCh(catalog.lessons.filter((e) => e.module === mod).reduce((s, e) => s + e.itemIds.length, 0))));
+  return h(
+    'section',
+    { class: 'home-section' },
+    h('h2', { class: 'section-title' }, 'Уроки'),
+    h('div', { class: 'module-grid', style: `--count-ch:${countCh}` }, cards),
+  );
+}
+
+/** Найдовший запис «зроблено/усього» для лічильника з цим total, у символах моноширинного шрифту. */
+function fractionCh(total) {
+  return 2 * String(total).length + 1;
 }
 
 function levelsSection(ctx) {
@@ -129,5 +142,12 @@ function levelsSection(ctx) {
       h('div', { class: 'level-progress' }, h('span', { class: 'level-count' }, `${c.done}/${c.total}`), progressBar(c.done, c.total, level.title)),
     );
   });
-  return h('section', { class: 'home-section' }, h('h2', { class: 'section-title' }, icon('stairs'), h('span', {}, 'Практикум')), h('div', { class: 'levels' }, rows));
+  const countCh = Math.max(3, ...catalog.tasks.map((e) => fractionCh(e.itemIds.length)));
+  const levelCountCh = Math.max(3, ...catalog.levels.map((level) => fractionCh(catalog.tasks.filter((e) => e.level === level).reduce((s, e) => s + e.itemIds.length, 0))));
+  return h(
+    'section',
+    { class: 'home-section' },
+    h('h2', { class: 'section-title' }, icon('stairs'), h('span', {}, 'Практикум')),
+    h('div', { class: 'levels', style: `--count-ch:${countCh};--level-count-ch:${levelCountCh}` }, rows),
+  );
 }

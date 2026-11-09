@@ -27,6 +27,36 @@ export function clear(el) {
   return el;
 }
 
+/** Заміна вмісту за правилами h(): масиви розгортаються, null і false пропускаються. */
+export function fill(el, ...children) {
+  clear(el);
+  append(el, children);
+  return el;
+}
+
+/**
+ * Одна ширина колонки на весь стос рядків: найширший текст комірок в один рядок задає
+ * CSS-змінну prop на root. Міряються приховані копії поза потоком, бо сама комірка
+ * залежить від поточної сітки і на вузькому екрані переносить текст. Міряє після
+ * вставки в документ і після завантаження шрифтів.
+ */
+export function fitColumn(root, selector, prop) {
+  const measure = () => {
+    if (!root.isConnected) return;
+    const ghosts = [...root.querySelectorAll(selector)].map((cell) => {
+      const ghost = cell.cloneNode(true);
+      ghost.style.cssText = 'position:absolute;visibility:hidden;width:max-content;white-space:nowrap';
+      cell.after(ghost);
+      return ghost;
+    });
+    const max = Math.max(0, ...ghosts.map((g) => g.getBoundingClientRect().width));
+    ghosts.forEach((g) => g.remove());
+    if (max) root.style.setProperty(prop, `${Math.ceil(max)}px`);
+  };
+  requestAnimationFrame(measure);
+  document.fonts?.ready.then(measure);
+}
+
 export function pluralUk(n, one, few, many) {
   const mod10 = n % 10;
   const mod100 = n % 100;
