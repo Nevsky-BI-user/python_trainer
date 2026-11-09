@@ -818,7 +818,7 @@ expect(counts == {"samsung": 4, "xiaomi": 3, "apple": 3}, f"Очікувалос
 <p>Коли в колонці кілька форматів, <code>format="mixed"</code> розбирає кожне значення окремо, а <code>errors="coerce"</code> робить нерозпізнане (<code>"березень"</code>, порожній рядок, <code>"31.02.2026"</code>) значенням <code>NaT</code>. Пастка: <code>format="mixed", dayfirst=True</code> переставляє день і місяць і в датах <code>"2026-03-05"</code>. Якщо поруч є дати ISO, розбирай кожен формат своїм <code>to_datetime</code> з <code>errors="coerce"</code> і об'єднуй через <code>fillna</code>.</p>
 <p>З колонки дат <code>.dt</code> дістає частини: <code>.dt.year</code>, <code>.dt.month</code>, <code>.dt.day</code>. <code>.dt.to_period("M")</code> перетворює дату на місяць (<code>2026-03</code>), за ним зручно групувати: <code>df.groupby(df["date"].dt.to_period("M"))["amount"].sum()</code>.</p>
 <p><strong>Викиди</strong> шукають через міжквартильний розмах (IQR): <code>q1, q3 = s.quantile([0.25, 0.75])</code>, <code>iqr = q3 - q1</code>, межі <code>q1 - 1.5 * iqr</code> і <code>q3 + 1.5 * iqr</code>. Усе, що за межами, варто роздивитись: це може бути зайвий нуль, тестове замовлення або справжній великий клієнт.</p>
-<p>Далі рішення: видалити рядки (<code>s[(s &gt;= low) &amp; (s &lt;= high)]</code>) або обрізати значення до меж через <code>s.clip(low, high)</code>, тоді рядки лишаються, а викид не тягне середнє. Справжні великі продажі не обрізають, коли рахують виручку: межі IQR корисні для середніх і графіків, а не для сум у звіті.</p>`,
+<p>Далі рішення: видалити рядки (<code>s[(s &gt;= low) &amp; (s &lt;= high)]</code>) або обрізати значення до меж через <code>s.clip(low, high)</code>, тоді рядки лишаються, а викид не тягне середнє. Помилкові суми (зайвий нуль, тестовий чек) обрізають чи видаляють; справжні великі продажі в сумі виручки лишають як є, а межі IQR застосовують для середніх і графіків.</p>`,
       examples: [
         {
           code: `import pandas as pd
@@ -845,6 +845,7 @@ d = pd.to_datetime(raw, format="mixed", dayfirst=True, errors="coerce")
 print(d)
 print("не розібрано:", d.isna().sum())
 
+# пастка: тут день і місяць переставляться, 5 березня стане 3 травня
 iso = pd.Series(["2026-03-05", "2026-03-10"])
 print(pd.to_datetime(iso, format="mixed", dayfirst=True).tolist())`,
           output: `0   2026-03-05
