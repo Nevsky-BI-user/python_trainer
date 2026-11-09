@@ -32,3 +32,6 @@ Vite 8 + ванільний JS (ES-модулі), CodeMirror 6, Pyodide 314.0.7 
   і `false` пропускаються. `replaceChildren` з масивом друкує `[object …]`.
 - Підказки (`hint`) звичайний текст; HTML лише в `theory`, `story`, `task`.
 - Робочі копії гілок: `.claude/worktrees/<назва>`; знімки, логи, разові файли: `.local/`.
+- Запуск з ярлика (`scripts/start.mjs`): порт 5317 не міняти. localStorage прив'язаний до
+  адреси з портом, новий порт сховає учню весь прогрес. `scripts/shortcut.ps1` лишається
+  в UTF-8 з BOM, інакше PowerShell 5.1 псує кирилицю в назві ярлика.

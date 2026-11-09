@@ -5,6 +5,7 @@
   "description": "Інтерактивний тренажер Python для дата-аналітика: справжній Python у браузері (Pyodide), уроки, вправи і багатокрокові задачі за рівнями складності",
   "type": "module",
   "scripts": {
+    "start": "node scripts/start.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
